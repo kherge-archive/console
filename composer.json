@@ -40,8 +40,6 @@
         "symfony/config": "~2.5",
         "symfony/console": "~2.5",
         "symfony/dependency-injection": "~2.5",
-        "symfony/event-dispatcher": "~2.5",
-        "symfony/expression-language": "~2.5",
         "symfony/yaml": "~2.5"
     },
 
@@ -58,6 +56,8 @@
     },
 
     "suggest": {
-        "symfony/framework-bundle": "For debugging container services."
+        "symfony/event-dispatcher": "Enables support for observing console events.",
+        "symfony/expression-language": "Allows expressions to be used in service registrations.",
+        "symfony/framework-bundle": "Enables commands for debugging service registration."
     }
 }
