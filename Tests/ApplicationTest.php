@@ -54,5 +54,12 @@ class ApplicationTest extends CommandTestCase
             $this->container->get(Application::SERVICE_ID . '.helper_set'),
             $this->container->get(Application::SERVICE_ID)->getHelperSet()
         );
+
+        // make sure the default helpers are registered
+        self::assertNotNull(
+            $this
+                ->container
+                ->has(Application::SERVICE_ID . '.helper.formatter')
+        );
     }
 }

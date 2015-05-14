@@ -3,6 +3,7 @@
 namespace Box\Component\Console;
 
 use Box\Component\Console\Exception\DefinitionException;
+use ReflectionMethod;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -68,7 +69,7 @@ class Application
      *
      * @return integer The exit status.
      *
-     * @todo Make arguments default and fallback to services.
+     * @todo Make argument defaults and fallback to services.
      */
     public function run(InputInterface $input, OutputInterface $output)
     {
@@ -77,6 +78,84 @@ class Application
             ->get(self::SERVICE_ID)
             ->run($input, $output)
         ;
+    }
+
+    // @todo Register default commands.
+    // @todo Register default compiler passes.
+
+    /**
+     * Returns the default list of helpers.
+     *
+     * The list of helpers is retrieved from an instance of the application
+     * class that is instantiated without its constructor. The key is the name
+     * of the helper, while the value is the fully qualified name of the helper
+     * class.
+     *
+     * @param ContainerBuilder $container The container.
+     *
+     * @return array The list of helper classes.
+     */
+    protected function getDefaultHelpers(ContainerBuilder $container)
+    {
+        $reflection = new ReflectionMethod(
+            $container->getParameter(self::SERVICE_ID . '.class'),
+            'getDefaultHelperSet'
+        );
+
+        $reflection->setAccessible(true);
+
+        $set = $reflection->invoke(
+            $reflection
+                ->getDeclaringClass()
+                ->newInstanceWithoutConstructor()
+        );
+
+        $helpers = array();
+
+        foreach ($set as $name => $helper) {
+            $helpers[$name] = get_class($helper);
+        }
+
+        return $helpers;
+    }
+
+    /**
+     * Adds a method call to a definition if one is not already made.
+     *
+     * The `$id` is prefixed with `SERVICE_ID`.
+     *
+     * @param ContainerBuilder $container  The container.
+     * @param string           $id         The service identifier.
+     * @param string           $method     The name of the method.
+     * @param array            $arguments  The call arguments.
+     *
+     * @return Application For method chaining.
+     *
+     * @throws DefinitionException If the definition does not exist.
+     */
+    private function addMethodCall(
+        ContainerBuilder $container,
+        $id,
+        $method,
+        array $arguments = array()
+    ) {
+        $id = self::SERVICE_ID . $id;
+
+        if (!$container->hasDefinition($id)) {
+            throw DefinitionException::notExist($id); // @codeCoverageIgnore
+        }
+
+        $definition = $container->getDefinition($id);
+
+        foreach ($definition->getMethodCalls() as $call) {
+            if ($method === $call[0]) {
+                return $this; // @codeCoverageIgnore
+            }
+        }
+
+        $definition->addMethodCall($method, $arguments);
+
+        return $this;
     }
 
     /**
@@ -89,6 +168,7 @@ class Application
         $this
             ->registerApplication($container)
             ->registerHelperSet($container)
+            ->registerDefaultHelpers($container)
         ;
     }
 
@@ -148,6 +228,44 @@ class Application
     }
 
     /**
+     * Registers the default list of helpers.
+     *
+     * @param ContainerBuilder $container The container.
+     *
+     * @return Application For method chaining.
+     */
+    private function registerDefaultHelpers(ContainerBuilder $container)
+    {
+        $helpers = $this->getDefaultHelpers($container);
+
+        foreach ($helpers as $name => $class) {
+            $this
+
+                // box.console.helper.?
+                ->setDefinition(
+                    $container,
+                    ".helper.$name",
+                    function () use ($name) {
+                        $definition = new Definition(
+                            '%' . self::SERVICE_ID . ".helper.$name.class%"
+                        );
+
+                        // @todo Add tag for compiler pass.
+
+                        return $definition;
+                    }
+                )
+
+                // box.console.helper.?.class
+                ->setParameter($container, ".helper.$name.class", $class)
+
+            ;
+        }
+
+        return $this;
+    }
+
+    /**
      * Registers the helper set with the container.
      *
      * @param ContainerBuilder $container The container.
@@ -163,11 +281,9 @@ class Application
                 $container,
                 '.helper_set',
                 function () {
-                    $definition = new Definition(
+                    return new Definition(
                         '%' . self::SERVICE_ID . '.helper_set.class%'
                     );
-
-                    return $definition;
                 }
             )
 
@@ -189,45 +305,6 @@ class Application
             )
 
         ;
-
-        return $this;
-    }
-
-    /**
-     * Adds a method call to a definition if one is not already made.
-     *
-     * The `$id` is prefixed with `SERVICE_ID`.
-     *
-     * @param ContainerBuilder $container  The container.
-     * @param string           $id         The service identifier.
-     * @param string           $method     The name of the method.
-     * @param array            $arguments  The call arguments.
-     *
-     * @return Application For method chaining.
-     *
-     * @throws DefinitionException If the definition does not exist.
-     */
-    private function addMethodCall(
-        ContainerBuilder $container,
-        $id,
-        $method,
-        array $arguments = array()
-    ) {
-        $id = self::SERVICE_ID . $id;
-
-        if (!$container->hasDefinition($id)) {
-            throw DefinitionException::notExist($id); // @codeCoverageIgnore
-        }
-
-        $definition = $container->getDefinition($id);
-
-        foreach ($definition->getMethodCalls() as $call) {
-            if ($method === $call[0]) {
-                return $this; // @codeCoverageIgnore
-            }
-        }
-
-        $definition->addMethodCall($method, $arguments);
 
         return $this;
     }
