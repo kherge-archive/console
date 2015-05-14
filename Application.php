@@ -2,9 +2,11 @@
 
 namespace Box\Component\Console;
 
+use Box\Component\Console\DependencyInjection\Compiler\CommandPass;
 use Box\Component\Console\DependencyInjection\Compiler\HelperPass;
 use Box\Component\Console\Exception\DefinitionException;
 use ReflectionMethod;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -110,8 +112,6 @@ class Application
         ;
     }
 
-    // @todo Register default commands.
-
     /**
      * Returns the list of compiler passes.
      *
@@ -121,12 +121,60 @@ class Application
     {
         return array(
             PassConfig::TYPE_BEFORE_OPTIMIZATION => array(
+
+                // box.console.command
+                new CommandPass(
+                    self::getId('command'),
+                    'Symfony\Component\Console\Command\Command'
+                ),
+
+                // box.console.helper
                 new HelperPass(
                     self::getId('helper'),
                     'Symfony\Component\Console\Helper\Helper'
                 )
+
             )
         );
+    }
+
+    /**
+     * Returns the default list of commands.
+     *
+     * The list of commands is retrieved from an instance of the application
+     * class that is instantiated without its constructor. The key is the name
+     * of the command (with ":" replace with "_"), while the value is the fully
+     * qualified name of the command class.
+     *
+     * @param ContainerBuilder $container The container.
+     *
+     * @return array The list of command classes.
+     */
+    protected function getDefaultCommands(ContainerBuilder $container)
+    {
+        $reflection = new ReflectionMethod(
+            $container->getParameter(self::getId('class')),
+            'getDefaultCommands'
+        );
+
+        $reflection->setAccessible(true);
+
+        $set = $reflection->invoke(
+            $reflection
+                ->getDeclaringClass()
+                ->newInstanceWithoutConstructor()
+        );
+
+        $commands = array();
+
+        /** @var Command $command */
+        foreach ($set as $command) {
+            $name = str_replace(':', '_', $command->getName());
+
+            $commands[$name] = get_class($command);
+        }
+
+        return $commands;
     }
 
     /**
@@ -216,6 +264,7 @@ class Application
             ->registerCompilerPasses($container)
             ->registerHelperSet($container)
             ->registerDefaultHelpers($container)
+            ->registerDefaultCommands($container)
             ->registerInputManager($container)
             ->registerOutputManager($container)
         ;
@@ -325,6 +374,44 @@ class Application
 
                 // box.console.helper.?.class
                 ->setParameter($container, "helper.$name.class", $class)
+
+            ;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Registers the default list of commands.
+     *
+     * @param ContainerBuilder $container The container.
+     *
+     * @return Application For method chaining.
+     */
+    private function registerDefaultCommands(ContainerBuilder $container)
+    {
+        $commands = $this->getDefaultCommands($container);
+
+        foreach ($commands as $name => $class) {
+            $this
+
+                // box.console.command.?
+                ->setDefinition(
+                    $container,
+                    "command.$name",
+                    function () use ($name) {
+                        $definition = new Definition(
+                            '%' . self::getId("command.$name.class") . '%'
+                        );
+
+                        $definition->addTag(self::getId('command'));
+
+                        return $definition;
+                    }
+                )
+
+                // box.console.command.?.class
+                ->setParameter($container, "command.$name.class", $class)
 
             ;
         }

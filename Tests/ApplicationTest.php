@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\Container;
  *
  * @covers \Box\Component\Console\Application
  * @covers \Box\Component\Console\DependencyInjection\Compiler\AbstractTaggedPass
+ * @covers \Box\Component\Console\DependencyInjection\Compiler\CommandPass
  * @covers \Box\Component\Console\DependencyInjection\Compiler\HelperPass
  * @covers \Box\Component\Console\Test\CommandTestCase
  */
@@ -73,6 +74,35 @@ class ApplicationTest extends CommandTestCase
                 ->container
                 ->get(Application::getId('helper_set'))
                 ->get('formatter')
+        );
+
+        // make sure the default commands are registered
+        self::assertNotNull(
+            $this
+                ->container
+                ->has(Application::getId('command.help'))
+        );
+
+        // make sure the commands are registered with the application.
+        $command = $this
+            ->container
+            ->get(Application::getId('command.help'))
+        ;
+
+        self::assertSame(
+            $command,
+            $this
+                ->container
+                ->get(Application::getId())
+                ->find($command->getName())
+        );
+
+        // make sure the commands use the helper set service
+        self::assertSame(
+            $this
+                ->container
+                ->get(Application::getId('helper_set')),
+            $command->getHelperSet()
         );
     }
 }
