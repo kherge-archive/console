@@ -2,6 +2,7 @@
 
 namespace Box\Component\Console;
 
+use Box\Component\Console\Exception\DefinitionException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -140,6 +141,45 @@ class Application
             ->setParameter($container, '.version', 'UNKNOWN')
 
         ;
+
+        return $this;
+    }
+
+    /**
+     * Adds a method call to a definition if one is not already made.
+     *
+     * The `$id` is prefixed with `SERVICE_ID`.
+     *
+     * @param ContainerBuilder $container  The container.
+     * @param string           $id         The service identifier.
+     * @param string           $method     The name of the method.
+     * @param array            $arguments  The call arguments.
+     *
+     * @return Application For method chaining.
+     *
+     * @throws DefinitionException If the definition does not exist.
+     */
+    private function addMethodCall(
+        ContainerBuilder $container,
+        $id,
+        $method,
+        array $arguments = array()
+    ) {
+        $id = self::SERVICE_ID . $id;
+
+        if (!$container->hasDefinition($id)) {
+            throw DefinitionException::notExist($id); // @codeCoverageIgnore
+        }
+
+        $definition = $container->getDefinition($id);
+
+        foreach ($definition->getMethodCalls() as $call) {
+            if ($method === $call[0]) {
+                return $this; // @codeCoverageIgnore
+            }
+        }
+
+        $definition->addMethodCall($method, $arguments);
 
         return $this;
     }
