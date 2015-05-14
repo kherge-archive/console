@@ -68,14 +68,6 @@ class CommandTestCase extends TestCase
         InputInterface $input,
         OutputInterface &$output = null
     ) {
-        if (null === $this->container) {
-            $this->container = $this->createContainer();
-        }
-
-        if (null === $this->application) {
-            $this->application = new Application($this->container);
-        }
-
         if (null === $output) {
             $output = new StreamOutput(
                 fopen('php://memory', 'r+')
@@ -86,19 +78,17 @@ class CommandTestCase extends TestCase
     }
 
     /**
-     * Creates a new container for the application.
-     *
-     * @return ContainerInterface The new container.
+     * Creates a new container and application.
      */
-    protected function createContainer()
+    protected function setUp()
     {
-        $container = new ContainerBuilder();
-        $container->setParameter(
+        $this->container = new ContainerBuilder();
+        $this->container->setParameter(
             Application::SERVICE_ID . '.auto_exit',
             false
         );
 
-        return $container;
+        $this->application = new Application($this->container);
     }
 
     /**
