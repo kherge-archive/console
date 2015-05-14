@@ -74,7 +74,10 @@ class CommandTestCase extends TestCase
             );
         }
 
-        return $this->application->run($input, $output);
+        $this->container->set(Application::getId('input'), $input);
+        $this->container->set(Application::getId('output'), $output);
+
+        return $this->application->run();
     }
 
     /**

@@ -80,13 +80,27 @@ class Application
      * @param OutputInterface $output The output manager.
      *
      * @return integer The exit status.
-     *
-     * @todo Make argument defaults and fallback to services.
      */
-    public function run(InputInterface $input, OutputInterface $output)
-    {
+    public function run(
+        InputInterface $input = null,
+        OutputInterface $output = null
+    ) {
         if (!$this->container->isFrozen()) {
             $this->container->compile();
+        }
+
+        if (null === $input) {
+            $input = $this
+                ->getContainer()
+                ->get(self::getId('input'))
+            ;
+        }
+
+        if (null === $output) {
+            $output = $this
+                ->getContainer()
+                ->get(self::getId('output'))
+            ;
         }
 
         return $this
@@ -202,6 +216,8 @@ class Application
             ->registerCompilerPasses($container)
             ->registerHelperSet($container)
             ->registerDefaultHelpers($container)
+            ->registerInputManager($container)
+            ->registerOutputManager($container)
         ;
     }
 
@@ -353,6 +369,74 @@ class Application
                 $container,
                 'helper_set.class',
                 'Symfony\Component\Console\Helper\HelperSet'
+            )
+
+        ;
+
+        return $this;
+    }
+
+    /**
+     * Registers the input manager with the container.
+     *
+     * @param ContainerBuilder $container The container.
+     *
+     * @return Application For method chaining.
+     */
+    private function registerInputManager(ContainerBuilder $container)
+    {
+        $this
+
+            // box.console.input
+            ->setDefinition(
+                $container,
+                'input',
+                function () {
+                    return new Definition(
+                        '%' . self::getId('input.class') . '%'
+                    );
+                }
+            )
+
+            // box.console.input.class
+            ->setParameter(
+                $container,
+                'input.class',
+                'Symfony\Component\Console\Input\ArgvInput'
+            )
+
+        ;
+
+        return $this;
+    }
+
+    /**
+     * Registers the output manager with the container.
+     *
+     * @param ContainerBuilder $container The container.
+     *
+     * @return Application For method chaining.
+     */
+    private function registerOutputManager(ContainerBuilder $container)
+    {
+        $this
+
+            // box.console.output
+            ->setDefinition(
+                $container,
+                'output',
+                function () {
+                    return new Definition(
+                        '%' . self::getId('output.class') . '%'
+                    );
+                }
+            )
+
+            // box.console.output.class
+            ->setParameter(
+                $container,
+                'output.class',
+                'Symfony\Component\Console\Output\ConsoleOutput'
             )
 
         ;
