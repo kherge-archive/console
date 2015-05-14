@@ -66,14 +66,19 @@ class ApplicationTest extends CommandTestCase
         );
 
         // make sure the helpers are registered with the helper set
+        $helperSet = $this->container->get(Application::getId('helper_set'));
+
         self::assertSame(
             $this
                 ->container
                 ->get(Application::getId('helper.formatter')),
-            $this
-                ->container
-                ->get(Application::getId('helper_set'))
-                ->get('formatter')
+            $helperSet->get('formatter')
+        );
+
+        // make sure that the container helper is registered
+        self::assertSame(
+            $this->container,
+            $helperSet->get('container')->getContainer()
         );
 
         // make sure the default commands are registered
@@ -99,9 +104,7 @@ class ApplicationTest extends CommandTestCase
 
         // make sure the commands use the helper set service
         self::assertSame(
-            $this
-                ->container
-                ->get(Application::getId('helper_set')),
+            $helperSet,
             $command->getHelperSet()
         );
     }

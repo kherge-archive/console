@@ -264,6 +264,7 @@ class Application
             ->registerCompilerPasses($container)
             ->registerHelperSet($container)
             ->registerDefaultHelpers($container)
+            ->registerContainerHelper($container)
             ->registerDefaultCommands($container)
             ->registerInputManager($container)
             ->registerOutputManager($container)
@@ -339,6 +340,45 @@ class Application
                 $container->addCompilerPass($pass, $type);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Registers the container as a helper.
+     *
+     * @param ContainerBuilder $container The container.
+     *
+     * @return Application For method chaining.
+     */
+    private function registerContainerHelper(ContainerBuilder $container)
+    {
+        $this
+
+            // box.console.helper.container
+            ->setDefinition(
+                $container,
+                'helper.container',
+                function () {
+                    $definition = new Definition(
+                        '%' . self::getId('helper.container.class') . '%'
+                    );
+
+                    $definition->addArgument(new Reference('service_container'));
+                    $definition->addTag(self::getId('helper'));
+
+                    return $definition;
+                }
+            )
+
+            // box.console.helper.container.class
+            ->setParameter(
+                $container,
+                'helper.container.class',
+                'Box\Component\Console\Helper\ContainerHelper'
+            )
+
+        ;
 
         return $this;
     }
