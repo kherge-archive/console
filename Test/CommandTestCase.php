@@ -9,7 +9,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * Test case for commands registered with the console.
@@ -93,13 +92,10 @@ class CommandTestCase extends TestCase
      */
     protected function createContainer()
     {
-        $definition = new Definition('Symfony\Component\Console\Application');
-        $definition->addMethodCall('setAutoExit', array(false));
-
         $container = new ContainerBuilder();
-        $container->setDefinition(
-            Application::SERVICE_ID,
-            $definition
+        $container->setParameter(
+            Application::SERVICE_ID . '.auto_exit',
+            false
         );
 
         return $container;
