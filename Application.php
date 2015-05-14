@@ -26,13 +26,6 @@ class Application
     private $container;
 
     /**
-     * The application service identifier.
-     *
-     * @var string
-     */
-    private $id;
-
-    /**
      * Sets the container.
      *
      * If an instance of `ContainerBuilder` is provided, the default parameters
@@ -41,12 +34,9 @@ class Application
      * will not be set for that specific parameter or service definition.
      *
      * @param ContainerInterface $container The container.
-     * @param string             $id        The application service identifier.
      */
-    public function __construct(
-        ContainerInterface $container,
-        $id = 'box.console'
-    ) {
+    public function __construct(ContainerInterface $container)
+    {
         if ($container instanceof ContainerBuilder) {
             $this->prepareContainer($container);
         }
@@ -67,11 +57,17 @@ class Application
     /**
      * Returns the application service identifier.
      *
+     * @param string $id The identifier to append.
+     *
      * @return string The service identifier.
      */
-    public function getId()
+    public static function getId($id = null)
     {
-        return $this->id;
+        if (null === $id) {
+            return 'box.console';
+        }
+
+        return 'box.console.' . $id;
     }
 
     /**
@@ -88,7 +84,7 @@ class Application
     {
         return $this
             ->container
-            ->get($this->id)
+            ->get(self::getId())
             ->run($input, $output)
         ;
     }
@@ -111,7 +107,7 @@ class Application
     protected function getDefaultHelpers(ContainerBuilder $container)
     {
         $reflection = new ReflectionMethod(
-            $container->getParameter($this->id . '.class'),
+            $container->getParameter(self::getId('class')),
             'getDefaultHelperSet'
         );
 
@@ -152,7 +148,7 @@ class Application
         $method,
         array $arguments = array()
     ) {
-        $id = $this->id . $id;
+        $id = self::getId($id);
 
         if (!$container->hasDefinition($id)) {
             throw DefinitionException::notExist($id); // @codeCoverageIgnore
@@ -199,19 +195,19 @@ class Application
             // box.console
             ->setDefinition(
                 $container,
-                '',
+                null,
                 function () {
                     $definition = new Definition(
-                        '%' . $this->id . '.class%'
+                        '%' . self::getId('class') . '%'
                     );
 
-                    $definition->addArgument($this->id . '.name');
-                    $definition->addArgument($this->id . '.version');
+                    $definition->addArgument(self::getId('name'));
+                    $definition->addArgument(self::getId('version'));
 
                     $definition->addMethodCall(
                         'setAutoExit',
                         array(
-                            '%' . $this->id . '.auto_exit%'
+                            '%' . self::getId('auto_exit') . '%'
                         )
                     );
 
@@ -220,20 +216,20 @@ class Application
             )
 
             // box.console.auto_exit
-            ->setParameter($container, '.auto_exit', false)
+            ->setParameter($container, 'auto_exit', false)
 
             // box.console.class
             ->setParameter(
                 $container,
-                '.class',
+                'class',
                 'Symfony\Component\Console\Application'
             )
 
             // box.console.name
-            ->setParameter($container, '.name', 'UNKNOWN')
+            ->setParameter($container, 'name', 'UNKNOWN')
 
             // box.console.version
-            ->setParameter($container, '.version', 'UNKNOWN')
+            ->setParameter($container, 'version', 'UNKNOWN')
 
         ;
 
@@ -260,7 +256,7 @@ class Application
                     ".helper.$name",
                     function () use ($name) {
                         $definition = new Definition(
-                            '%' . $this->id . ".helper.$name.class%"
+                            '%' . self::getId("helper.$name.class") . '%'
                         );
 
                         // @todo Add tag for compiler pass.
@@ -292,10 +288,10 @@ class Application
             // box.console.helper_set
             ->setDefinition(
                 $container,
-                '.helper_set',
+                'helper_set',
                 function () {
                     return new Definition(
-                        '%' . $this->id . '.helper_set.class%'
+                        '%' . self::getId('helper_set.class') . '%'
                     );
                 }
             )
@@ -303,17 +299,17 @@ class Application
             // Application->setHelperSet()
             ->addMethodCall(
                 $container,
-                '',
+                null,
                 'setHelperSet',
                 array(
-                    new Reference($this->id . '.helper_set')
+                    new Reference(self::getId('helper_set'))
                 )
             )
 
             // box.console.helper_set.class
             ->setParameter(
                 $container,
-                '.helper_set.class',
+                'helper_set.class',
                 'Symfony\Component\Console\Helper\HelperSet'
             )
 
@@ -338,7 +334,7 @@ class Application
         $id,
         callable $definition
     ) {
-        $id = $this->id . $id;
+        $id = self::getId($id);
 
         if (!$container->hasDefinition($id)) {
             $container->setDefinition($id, $definition($container));
@@ -360,7 +356,7 @@ class Application
      */
     private function setParameter(ContainerBuilder $container, $name, $value)
     {
-        $name = $this->id . $name;
+        $name = self::getId($name);
 
         if (!$container->hasParameter($name)) {
             $container->setParameter($name, $value);

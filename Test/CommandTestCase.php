@@ -86,7 +86,7 @@ class CommandTestCase extends TestCase
         $this->application = new Application($this->container);
 
         $this->container->setParameter(
-            $this->application->getId() . '.auto_exit',
+            Application::getId('auto_exist'),
             false
         );
     }
