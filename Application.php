@@ -19,18 +19,18 @@ use Symfony\Component\DependencyInjection\Reference;
 class Application
 {
     /**
-     * The application service identifier.
-     *
-     * @var string
-     */
-    const SERVICE_ID = 'box.console';
-
-    /**
      * The container.
      *
      * @var ContainerInterface
      */
     private $container;
+
+    /**
+     * The application service identifier.
+     *
+     * @var string
+     */
+    private $id;
 
     /**
      * Sets the container.
@@ -41,9 +41,12 @@ class Application
      * will not be set for that specific parameter or service definition.
      *
      * @param ContainerInterface $container The container.
+     * @param string             $id        The application service identifier.
      */
-    public function __construct(ContainerInterface $container)
-    {
+    public function __construct(
+        ContainerInterface $container,
+        $id = 'box.console'
+    ) {
         if ($container instanceof ContainerBuilder) {
             $this->prepareContainer($container);
         }
@@ -62,6 +65,16 @@ class Application
     }
 
     /**
+     * Returns the application service identifier.
+     *
+     * @return string The service identifier.
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
      * Runs the console application.
      *
      * @param InputInterface  $input  The input manager.
@@ -75,7 +88,7 @@ class Application
     {
         return $this
             ->container
-            ->get(self::SERVICE_ID)
+            ->get($this->id)
             ->run($input, $output)
         ;
     }
@@ -98,7 +111,7 @@ class Application
     protected function getDefaultHelpers(ContainerBuilder $container)
     {
         $reflection = new ReflectionMethod(
-            $container->getParameter(self::SERVICE_ID . '.class'),
+            $container->getParameter($this->id . '.class'),
             'getDefaultHelperSet'
         );
 
@@ -139,7 +152,7 @@ class Application
         $method,
         array $arguments = array()
     ) {
-        $id = self::SERVICE_ID . $id;
+        $id = $this->id . $id;
 
         if (!$container->hasDefinition($id)) {
             throw DefinitionException::notExist($id); // @codeCoverageIgnore
@@ -189,16 +202,16 @@ class Application
                 '',
                 function () {
                     $definition = new Definition(
-                        '%' . self::SERVICE_ID . '.class%'
+                        '%' . $this->id . '.class%'
                     );
 
-                    $definition->addArgument(self::SERVICE_ID . '.name');
-                    $definition->addArgument(self::SERVICE_ID . '.version');
+                    $definition->addArgument($this->id . '.name');
+                    $definition->addArgument($this->id . '.version');
 
                     $definition->addMethodCall(
                         'setAutoExit',
                         array(
-                            '%' . self::SERVICE_ID . '.auto_exit%'
+                            '%' . $this->id . '.auto_exit%'
                         )
                     );
 
@@ -247,7 +260,7 @@ class Application
                     ".helper.$name",
                     function () use ($name) {
                         $definition = new Definition(
-                            '%' . self::SERVICE_ID . ".helper.$name.class%"
+                            '%' . $this->id . ".helper.$name.class%"
                         );
 
                         // @todo Add tag for compiler pass.
@@ -282,7 +295,7 @@ class Application
                 '.helper_set',
                 function () {
                     return new Definition(
-                        '%' . self::SERVICE_ID . '.helper_set.class%'
+                        '%' . $this->id . '.helper_set.class%'
                     );
                 }
             )
@@ -293,7 +306,7 @@ class Application
                 '',
                 'setHelperSet',
                 array(
-                    new Reference(self::SERVICE_ID . '.helper_set')
+                    new Reference($this->id . '.helper_set')
                 )
             )
 
@@ -325,7 +338,7 @@ class Application
         $id,
         callable $definition
     ) {
-        $id = self::SERVICE_ID . $id;
+        $id = $this->id . $id;
 
         if (!$container->hasDefinition($id)) {
             $container->setDefinition($id, $definition($container));
@@ -347,7 +360,7 @@ class Application
      */
     private function setParameter(ContainerBuilder $container, $name, $value)
     {
-        $name = self::SERVICE_ID . $name;
+        $name = $this->id . $name;
 
         if (!$container->hasParameter($name)) {
             $container->setParameter($name, $value);

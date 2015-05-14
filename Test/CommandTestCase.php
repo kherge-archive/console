@@ -83,12 +83,12 @@ class CommandTestCase extends TestCase
     protected function setUp()
     {
         $this->container = new ContainerBuilder();
+        $this->application = new Application($this->container);
+
         $this->container->setParameter(
-            Application::SERVICE_ID . '.auto_exit',
+            $this->application->getId() . '.auto_exit',
             false
         );
-
-        $this->application = new Application($this->container);
     }
 
     /**
