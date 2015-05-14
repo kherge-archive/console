@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 
 /**
  * Basis for a console application assembled by dependency injection.
@@ -119,7 +120,7 @@ class Application
      */
     protected function getCompilerPasses()
     {
-        return array(
+        $passes = array(
             PassConfig::TYPE_BEFORE_OPTIMIZATION => array(
 
                 // box.console.command
@@ -136,6 +137,20 @@ class Application
 
             )
         );
+
+        /*
+         * box.console.event.listener
+         * box.console.event.subscriber
+         */
+        if (class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
+            $passes[] = new RegisterListenersPass(
+                self::getId('event_dispatcher'),
+                self::getId('event.listener'),
+                self::getId('event.subscriber')
+            );
+        }
+
+        return $passes;
     }
 
     /**
@@ -261,6 +276,7 @@ class Application
     {
         $this
             ->registerApplication($container)
+            ->registerEventDispatcher($container)
             ->registerCompilerPasses($container)
             ->registerHelperSet($container)
             ->registerDefaultHelpers($container)
@@ -455,6 +471,59 @@ class Application
 
             ;
         }
+
+        return $this;
+    }
+
+    /**
+     * Registers the event dispatcher with the container.
+     *
+     * @param ContainerBuilder $container The container.
+     *
+     * @return Application For method chaining.
+     */
+    private function registerEventDispatcher(ContainerBuilder $container)
+    {
+        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
+            return $this; // @codeCoverageIgnore
+        }
+
+        $this
+
+            // box.console.event_dispatcher
+            ->setDefinition(
+                $container,
+                'event_dispatcher',
+                function () {
+                    $definition = new Definition(
+                        '%' . self::getId('event_dispatcher.class') . '%'
+                    );
+
+                    $definition->addArgument(
+                        new Reference('service_container')
+                    );
+
+                    return $definition;
+                }
+            )
+
+            ->addMethodCall(
+                $container,
+                null,
+                'setDispatcher',
+                array(
+                    new Reference(self::getId('event_dispatcher'))
+                )
+            )
+
+            // box.console.event_dispatcher.class
+            ->setParameter(
+                $container,
+                'event_dispatcher.class',
+                'Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher'
+            )
+
+        ;
 
         return $this;
     }

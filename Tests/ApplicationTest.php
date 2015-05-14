@@ -4,6 +4,8 @@ namespace Box\Component\Console\Tests;
 
 use Box\Component\Console\Application;
 use Box\Component\Console\Test\CommandTestCase;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\DependencyInjection\Container;
 
@@ -37,6 +39,18 @@ class ApplicationTest extends CommandTestCase
      */
     public function testRun()
     {
+        // registers a simple event listener
+        $this
+            ->container
+            ->get(Application::getId('event_dispatcher'))
+            ->addListener(
+                ConsoleEvents::COMMAND,
+                function (ConsoleCommandEvent $event) {
+                    $event->getOutput()->writeln('Event listened.');
+                }
+            )
+        ;
+
         // make sure it does not exit
         self::assertEquals(
             0,
@@ -47,10 +61,12 @@ class ApplicationTest extends CommandTestCase
         );
 
         // make sure it uses our output
-        self::assertContains(
-            'help',
-            $this->readOutput($output)
-        );
+        $output = $this->readOutput($output);
+
+        self::assertContains('help', $output);
+
+        // make sure that the event dispatcher is used
+        self::assertContains('Event listened.', $output);
 
         // make sure the helper set is registered
         self::assertSame(
