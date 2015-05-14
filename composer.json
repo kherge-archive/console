@@ -1,0 +1,63 @@
+{
+    "name": "box-project/console",
+    "description": "A console application assembled through dependency injection",
+    "keywords": ["console", "dependency", "injection"],
+    "license": "MIT",
+    "homepage": "http://box-project.org",
+    "support": {
+        "issues": "https://github.com/box-project/console/issues",
+        "source": "https://github.com/box-project/console",
+        "wiki": "https://github.com/box-project/console/wiki"
+    },
+
+    "authors": [
+        {
+            "name": "Kevin Herrera",
+            "email": "kevin@herrera.io",
+            "homepage": "http://kevin.herrera.io/",
+            "role": "Developer"
+        }
+    ],
+
+    "autoload": {
+        "psr-4": {
+            "Box\\Component\\Console\\": ""
+        }
+    },
+
+    "config": {
+        "bin-dir": "bin"
+    },
+
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+
+    "require": {
+        "php": ">=5.4",
+        "symfony/config": "~2.5",
+        "symfony/console": "~2.5",
+        "symfony/dependency-injection": "~2.5",
+        "symfony/event-dispatcher": "~2.5",
+        "symfony/expression-language": "~2.5",
+        "symfony/yaml": "~2.5"
+    },
+
+    "require-dev": {
+        "kherge/file": "~1.3",
+        "phpunit/phpunit": "~4.6",
+        "symfony/config": "2.5.*",
+        "symfony/console": "2.5.*",
+        "symfony/dependency-injection": "2.5.*",
+        "symfony/event-dispatcher": "2.5.*",
+        "symfony/expression-language": "2.5.*",
+        "symfony/framework-bundle": "2.5.*",
+        "symfony/yaml": "2.5.*"
+    },
+
+    "suggest": {
+        "symfony/framework-bundle": "For debugging container services."
+    }
+}
