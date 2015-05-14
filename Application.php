@@ -65,6 +65,8 @@ class Application
      * @param OutputInterface $output The output manager.
      *
      * @return integer The exit status.
+     *
+     * @todo Make arguments default and fallback to services.
      */
     public function run(InputInterface $input, OutputInterface $output)
     {
@@ -101,7 +103,7 @@ class Application
             // box.console
             ->setDefinition(
                 $container,
-                self::SERVICE_ID,
+                '',
                 function () {
                     $definition = new Definition(
                         '%' . self::SERVICE_ID . '.class%'
@@ -122,20 +124,20 @@ class Application
             )
 
             // box.console.auto_exit
-            ->setParameter($container, self::SERVICE_ID . '.auto_exit', false)
+            ->setParameter($container, '.auto_exit', false)
 
             // box.console.class
             ->setParameter(
                 $container,
-                self::SERVICE_ID . '.class',
+                '.class',
                 'Symfony\Component\Console\Application'
             )
 
             // box.console.name
-            ->setParameter($container, self::SERVICE_ID . '.name', 'UNKNOWN')
+            ->setParameter($container, '.name', 'UNKNOWN')
 
             // box.console.version
-            ->setParameter($container, self::SERVICE_ID . '.version', 'UNKNOWN')
+            ->setParameter($container, '.version', 'UNKNOWN')
 
         ;
 
@@ -144,6 +146,8 @@ class Application
 
     /**
      * Sets the default definition if it is not already set.
+     *
+     * The `$id` is prefixed with `SERVICE_ID`.
      *
      * @param ContainerBuilder $container  The container.
      * @param string           $id         The service identifier.
@@ -156,6 +160,8 @@ class Application
         $id,
         callable $definition
     ) {
+        $id = self::SERVICE_ID . $id;
+
         if (!$container->hasDefinition($id)) {
             $container->setDefinition($id, $definition($container));
         }
@@ -166,6 +172,8 @@ class Application
     /**
      * Sets the default parameter value if it is not already set.
      *
+     * The `$name` is prefixed with `SERVICE_ID`.
+     *
      * @param ContainerBuilder $container The container.
      * @param string           $name      The name of the parameter.
      * @param mixed            $value     The value of the parameter.
@@ -174,6 +182,8 @@ class Application
      */
     private function setParameter(ContainerBuilder $container, $name, $value)
     {
+        $name = self::SERVICE_ID . $name;
+
         if (!$container->hasParameter($name)) {
             $container->setParameter($name, $value);
         }
