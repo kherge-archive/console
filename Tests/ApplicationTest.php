@@ -34,6 +34,7 @@ class ApplicationTest extends CommandTestCase
      */
     public function testRun()
     {
+        // make sure it does not exit
         self::assertEquals(
             0,
             $this->runCommand(
@@ -42,9 +43,16 @@ class ApplicationTest extends CommandTestCase
             )
         );
 
+        // make sure it uses our output
         self::assertContains(
             'help',
             $this->readOutput($output)
+        );
+
+        // make sure the helper set is registered
+        self::assertSame(
+            $this->container->get(Application::SERVICE_ID . '.helper_set'),
+            $this->container->get(Application::SERVICE_ID)->getHelperSet()
         );
     }
 }

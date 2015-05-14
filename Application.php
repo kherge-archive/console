@@ -8,6 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Basis for a console application assembled by dependency injection.
@@ -87,6 +88,7 @@ class Application
     {
         $this
             ->registerApplication($container)
+            ->registerHelperSet($container)
         ;
     }
 
@@ -139,6 +141,52 @@ class Application
 
             // box.console.version
             ->setParameter($container, '.version', 'UNKNOWN')
+
+        ;
+
+        return $this;
+    }
+
+    /**
+     * Registers the helper set with the container.
+     *
+     * @param ContainerBuilder $container The container.
+     *
+     * @return Application For method chaining.
+     */
+    private function registerHelperSet(ContainerBuilder $container)
+    {
+        $this
+
+            // box.console.helper_set
+            ->setDefinition(
+                $container,
+                '.helper_set',
+                function () {
+                    $definition = new Definition(
+                        '%' . self::SERVICE_ID . '.helper_set.class%'
+                    );
+
+                    return $definition;
+                }
+            )
+
+            // Application->setHelperSet()
+            ->addMethodCall(
+                $container,
+                '',
+                'setHelperSet',
+                array(
+                    new Reference(self::SERVICE_ID . '.helper_set')
+                )
+            )
+
+            // box.console.helper_set.class
+            ->setParameter(
+                $container,
+                '.helper_set.class',
+                'Symfony\Component\Console\Helper\HelperSet'
+            )
 
         ;
 
