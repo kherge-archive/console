@@ -100,4 +100,13 @@ class CommandTestCase extends TestCase
 
         return $container;
     }
+
+    /**
+     * Cleans up the test container and application instance.
+     */
+    protected function tearDown()
+    {
+        $this->application = null;
+        $this->container = null;
+    }
 }
