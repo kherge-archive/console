@@ -13,6 +13,8 @@ use Symfony\Component\DependencyInjection\Container;
  * @author Kevin Herrera <kevin@herrera.io>
  *
  * @covers \Box\Component\Console\Application
+ * @covers \Box\Component\Console\DependencyInjection\Compiler\AbstractTaggedPass
+ * @covers \Box\Component\Console\DependencyInjection\Compiler\HelperPass
  * @covers \Box\Component\Console\Test\CommandTestCase
  */
 class ApplicationTest extends CommandTestCase
@@ -60,6 +62,17 @@ class ApplicationTest extends CommandTestCase
             $this
                 ->container
                 ->has(Application::getId('helper.formatter'))
+        );
+
+        // make sure the helpers are registered with the helper set
+        self::assertSame(
+            $this
+                ->container
+                ->get(Application::getId('helper.formatter')),
+            $this
+                ->container
+                ->get(Application::getId('helper_set'))
+                ->get('formatter')
         );
     }
 }

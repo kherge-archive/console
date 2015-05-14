@@ -2,10 +2,13 @@
 
 namespace Box\Component\Console;
 
+use Box\Component\Console\DependencyInjection\Compiler\HelperPass;
 use Box\Component\Console\Exception\DefinitionException;
 use ReflectionMethod;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -94,7 +97,23 @@ class Application
     }
 
     // @todo Register default commands.
-    // @todo Register default compiler passes.
+
+    /**
+     * Returns the list of compiler passes.
+     *
+     * @return CompilerPassInterface[] The compiler passes.
+     */
+    protected function getCompilerPasses()
+    {
+        return array(
+            PassConfig::TYPE_BEFORE_OPTIMIZATION => array(
+                new HelperPass(
+                    self::getId('helper'),
+                    'Symfony\Component\Console\Helper\Helper'
+                )
+            )
+        );
+    }
 
     /**
      * Returns the default list of helpers.
@@ -180,6 +199,7 @@ class Application
     {
         $this
             ->registerApplication($container)
+            ->registerCompilerPasses($container)
             ->registerHelperSet($container)
             ->registerDefaultHelpers($container)
         ;
@@ -241,6 +261,24 @@ class Application
     }
 
     /**
+     * Registers the default list of compiler passes.
+     *
+     * @param ContainerBuilder $container The container.
+     *
+     * @return Application For method chaining.
+     */
+    private function registerCompilerPasses(ContainerBuilder $container)
+    {
+        foreach ($this->getCompilerPasses() as $type => $passes) {
+            foreach ($passes as $pass) {
+                $container->addCompilerPass($pass, $type);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Registers the default list of helpers.
      *
      * @param ContainerBuilder $container The container.
@@ -263,7 +301,7 @@ class Application
                             '%' . self::getId("helper.$name.class") . '%'
                         );
 
-                        // @todo Add tag for compiler pass.
+                        $definition->addTag(self::getId('helper'));
 
                         return $definition;
                     }
