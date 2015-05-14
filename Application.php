@@ -307,8 +307,8 @@ class Application
                         '%' . self::getId('class') . '%'
                     );
 
-                    $definition->addArgument(self::getId('name'));
-                    $definition->addArgument(self::getId('version'));
+                    $definition->addArgument('%' . self::getId('name') . '%');
+                    $definition->addArgument('%' . self::getId('version') . '%');
 
                     $definition->addMethodCall(
                         'setAutoExit',
