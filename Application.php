@@ -82,6 +82,10 @@ class Application
      */
     public function run(InputInterface $input, OutputInterface $output)
     {
+        if (!$this->container->isFrozen()) {
+            $this->container->compile();
+        }
+
         return $this
             ->container
             ->get(self::getId())
