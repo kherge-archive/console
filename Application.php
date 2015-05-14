@@ -257,7 +257,7 @@ class Application
                 // box.console.helper.?
                 ->setDefinition(
                     $container,
-                    ".helper.$name",
+                    "helper.$name",
                     function () use ($name) {
                         $definition = new Definition(
                             '%' . self::getId("helper.$name.class") . '%'
@@ -270,7 +270,7 @@ class Application
                 )
 
                 // box.console.helper.?.class
-                ->setParameter($container, ".helper.$name.class", $class)
+                ->setParameter($container, "helper.$name.class", $class)
 
             ;
         }
