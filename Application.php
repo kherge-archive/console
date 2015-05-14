@@ -32,6 +32,11 @@ class Application
     /**
      * Sets the container.
      *
+     * If an instance of `ContainerBuilder` is provided, the default parameters
+     * and services will be registered with the container. If a parameter or a
+     * service definition with the same identifier or key exists, the default
+     * will not be set for that specific parameter or service definition.
+     *
      * @param ContainerInterface $container The container.
      */
     public function __construct(ContainerInterface $container)
