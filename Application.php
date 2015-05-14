@@ -138,6 +138,8 @@ class Application
             ->setParameter($container, self::SERVICE_ID . '.version', 'UNKNOWN')
 
         ;
+
+        return $this;
     }
 
     /**
