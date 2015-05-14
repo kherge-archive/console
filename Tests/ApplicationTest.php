@@ -12,15 +12,13 @@ use Symfony\Component\DependencyInjection\Container;
  *
  * @author Kevin Herrera <kevin@herrera.io>
  *
+ * @covers \Box\Component\Console\Application
  * @covers \Box\Component\Console\Test\CommandTestCase
  */
 class ApplicationTest extends CommandTestCase
 {
     /**
      * Verifies that we can set and retrieve the container.
-     *
-     * @covers \Box\Component\Console\Application::__construct
-     * @covers \Box\Component\Console\Application::getContainer
      */
     public function testContainer()
     {
@@ -33,8 +31,6 @@ class ApplicationTest extends CommandTestCase
 
     /**
      * Verifies that we can run the application.
-     *
-     * @covers \Box\Component\Console\Application::run
      */
     public function testRun()
     {
