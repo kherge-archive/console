@@ -104,7 +104,7 @@ class Application
                 self::SERVICE_ID,
                 function () {
                     $definition = new Definition(
-                        'Symfony\Component\Console\Application'
+                        '%' . self::SERVICE_ID . '.class%'
                     );
 
                     $definition->addArgument(self::SERVICE_ID . '.name');
@@ -123,6 +123,13 @@ class Application
 
             // box.console.auto_exit
             ->setParameter($container, self::SERVICE_ID . '.auto_exit', false)
+
+            // box.console.class
+            ->setParameter(
+                $container,
+                self::SERVICE_ID . '.class',
+                'Symfony\Component\Console\Application'
+            )
 
             // box.console.name
             ->setParameter($container, self::SERVICE_ID . '.name', 'UNKNOWN')
