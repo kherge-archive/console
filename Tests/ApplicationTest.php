@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * @covers \Box\Component\Console\DependencyInjection\Compiler\AbstractTaggedPass
  * @covers \Box\Component\Console\DependencyInjection\Compiler\CommandPass
  * @covers \Box\Component\Console\DependencyInjection\Compiler\HelperPass
- * @covers \Box\Component\Console\Test\CommandTestCase
  */
 class ApplicationTest extends CommandTestCase
 {
