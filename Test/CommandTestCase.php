@@ -9,7 +9,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Test case for commands registered with the console.
@@ -28,7 +27,7 @@ class CommandTestCase extends TestCase
     /**
      * The container.
      *
-     * @var ContainerInterface
+     * @var ContainerBuilder
      */
     protected $container;
 

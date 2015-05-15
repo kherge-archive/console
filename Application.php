@@ -176,17 +176,13 @@ class Application
                 ->newInstanceWithoutConstructor()
         );
 
-        $commands = array();
+        $commands = $this->getBundledCommands();
 
         /** @var Command $command */
         foreach ($set as $command) {
             $name = str_replace(':', '_', $command->getName());
 
             $commands[$name] = get_class($command);
-        }
-
-        if (class_exists('Symfony\Bundle\FrameworkBundle\Command\ContainerDebugCommand')) {
-            $commands['debug_container'] = 'Box\Component\Console\Command\Debug\ContainerCommand';
         }
 
         return $commands;
@@ -219,7 +215,7 @@ class Application
                 ->newInstanceWithoutConstructor()
         );
 
-        $helpers = array();
+        $helpers = $this->getBundledHelpers();
 
         foreach ($set as $name => $helper) {
             $helpers[$name] = get_class($helper);
@@ -343,6 +339,7 @@ class Application
     {
         $commands = array(
             'config_current' => 'Box\Component\Console\Command\Config\CurrentCommand',
+            'config_list' => 'Box\Component\Console\Command\Config\ListCommand',
             'config_reference' => 'Box\Component\Console\Command\Config\ReferenceCommand'
         );
 
