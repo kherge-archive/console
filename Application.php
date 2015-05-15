@@ -396,44 +396,6 @@ class Application
     }
 
     /**
-     * Registers the default list of helpers.
-     *
-     * @param ContainerBuilder $container The container.
-     *
-     * @return Application For method chaining.
-     */
-    private function registerDefaultHelpers(ContainerBuilder $container)
-    {
-        $helpers = $this->getDefaultHelpers($container);
-
-        foreach ($helpers as $name => $class) {
-            $this
-
-                // box.console.helper.?
-                ->setDefinition(
-                    $container,
-                    "helper.$name",
-                    function () use ($name) {
-                        $definition = new Definition(
-                            '%' . self::getId("helper.$name.class") . '%'
-                        );
-
-                        $definition->addTag(self::getId('helper'));
-
-                        return $definition;
-                    }
-                )
-
-                // box.console.helper.?.class
-                ->setParameter($container, "helper.$name.class", $class)
-
-            ;
-        }
-
-        return $this;
-    }
-
-    /**
      * Registers the default list of commands.
      *
      * @param ContainerBuilder $container The container.
@@ -464,6 +426,44 @@ class Application
 
                 // box.console.command.?.class
                 ->setParameter($container, "command.$name.class", $class)
+
+            ;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Registers the default list of helpers.
+     *
+     * @param ContainerBuilder $container The container.
+     *
+     * @return Application For method chaining.
+     */
+    private function registerDefaultHelpers(ContainerBuilder $container)
+    {
+        $helpers = $this->getDefaultHelpers($container);
+
+        foreach ($helpers as $name => $class) {
+            $this
+
+                // box.console.helper.?
+                ->setDefinition(
+                    $container,
+                    "helper.$name",
+                    function () use ($name) {
+                        $definition = new Definition(
+                            '%' . self::getId("helper.$name.class") . '%'
+                        );
+
+                        $definition->addTag(self::getId('helper'));
+
+                        return $definition;
+                    }
+                )
+
+                // box.console.helper.?.class
+                ->setParameter($container, "helper.$name.class", $class)
 
             ;
         }
