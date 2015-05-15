@@ -3,9 +3,11 @@
 namespace Box\Component\Console;
 
 use Box\Component\Console\Exception\CacheException;
+use KHerGe\File\File;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
 
 /**
  * Manages the loading and saving of the application container cache.
@@ -108,6 +110,8 @@ class ApplicationCache extends Application
             throw CacheException::notBuilder(); // @codeCoverageIgnore
         }
 
+        $this->dumpXmlConfig($container, $file);
+
         if (!$container->isFrozen()) {
             $container->compile();
         }
@@ -123,5 +127,34 @@ class ApplicationCache extends Application
             ),
             $container->getResources()
         );
+    }
+
+    /**
+     * Dumps the container configuration as an XML file for rebuilding.
+     *
+     * @param ContainerBuilder $container The container builder.
+     * @param string           $file      The path to the cache file.
+     */
+    private function dumpXmlConfig(ContainerBuilder $container, $file)
+    {
+        $file = sprintf(
+            '%s%s%s.xml',
+            dirname($file),
+            DIRECTORY_SEPARATOR,
+            pathinfo($file, PATHINFO_FILENAME)
+        );
+
+        $container
+            ->getDefinition(self::getId('helper.container'))
+            ->addMethodCall(
+                'setFile',
+                array($file)
+            )
+        ;
+
+        $dumper = new XmlDumper($container);
+        $writer = new File($file, 'w');
+
+        $writer->fwrite($dumper->dump());
     }
 }
