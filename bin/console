@@ -1,0 +1,52 @@
+#!/usr/bin/env php
+<?php
+
+use Box\Component\Console\Application;
+use Box\Component\Console\Tests\DependencyInjection\Extension;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Loader\DelegatingLoader;
+use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+
+// load composer autoloader
+require __DIR__ . '/../Tests/autoload.php';
+
+// create an application with a new container
+$container = new ContainerBuilder();
+$app = new Application($container);
+
+// register the test extension
+$container = $app->getContainer();
+$extension = new Extension();
+
+/** @var ContainerBuilder $container */
+$container->registerExtension($extension);
+$container->loadFromExtension($extension->getAlias());
+
+// load test configuration if available
+$locator = new FileLocator(array('.'));
+$loader = new DelegatingLoader(
+    new LoaderResolver(
+        array(
+            new XmlFileLoader($container, $locator),
+            new YamlFileLoader($container, $locator)
+        )
+    )
+);
+
+try {
+    $loader->load('test.xml');
+} catch (InvalidArgumentException $exception) {
+    try {
+        $loader->load('test.yml');
+    } catch (InvalidArgumentException $exception) {
+    }
+}
+
+// compile the new container
+$app->getContainer()->compile();
+
+// run the application without caching
+$app->run();
