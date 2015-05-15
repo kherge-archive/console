@@ -15,8 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Test case for commands registered with the console.
  *
  * @author Kevin Herrera <kevin@herrera.io>
- *
- * @covers \Box\Component\Console\Test\CommandTestCase
  */
 class CommandTestCase extends TestCase
 {
