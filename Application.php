@@ -185,6 +185,10 @@ class Application
             $commands[$name] = get_class($command);
         }
 
+        if (class_exists('Symfony\Bundle\FrameworkBundle\Command\ContainerDebugCommand')) {
+            $commands['debug_container'] = 'Box\Component\Console\Command\Debug\ContainerCommand';
+        }
+
         return $commands;
     }
 
