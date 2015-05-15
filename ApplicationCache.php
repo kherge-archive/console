@@ -108,6 +108,10 @@ class ApplicationCache extends Application
             throw CacheException::notBuilder(); // @codeCoverageIgnore
         }
 
+        if (!$container->isFrozen()) {
+            $container->compile();
+        }
+
         $dumper = new PhpDumper($container);
         $cache = new ConfigCache($file, $debug);
 

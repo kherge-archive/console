@@ -88,10 +88,6 @@ class Application
         InputInterface $input = null,
         OutputInterface $output = null
     ) {
-        if (!$this->container->isFrozen()) {
-            $this->container->compile();
-        }
-
         if (null === $input) {
             $input = $this
                 ->getContainer()
