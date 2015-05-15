@@ -3,6 +3,7 @@
 namespace Box\Component\Console\Test;
 
 use Box\Component\Console\Application;
+use KHerGe\File\Utility;
 use PHPUnit_Framework_TestCase as TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -30,6 +31,13 @@ class CommandTestCase extends TestCase
      * @var ContainerInterface
      */
     protected $container;
+
+    /**
+     * The configuration directory.
+     *
+     * @var string
+     */
+    protected $configDir;
 
     /**
      * Returns the contents of the output stream.
@@ -94,6 +102,11 @@ class CommandTestCase extends TestCase
             Application::getId('auto_exist'),
             false
         );
+
+        $this->configDir = tempnam(sys_get_temp_dir(), 'box-');
+
+        unlink($this->configDir);
+        mkdir($this->configDir);
     }
 
     /**
@@ -103,5 +116,9 @@ class CommandTestCase extends TestCase
     {
         $this->application = null;
         $this->container = null;
+
+        if (file_exists($this->configDir)) {
+            Utility::remove($this->configDir);
+        }
     }
 }
