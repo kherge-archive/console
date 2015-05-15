@@ -242,7 +242,7 @@ class Application
      *
      * @throws DefinitionException If the definition does not exist.
      */
-    private function addMethodCall(
+    protected function addMethodCall(
         ContainerBuilder $container,
         $id,
         $method,
@@ -272,7 +272,7 @@ class Application
      *
      * @param ContainerBuilder $container The container.
      */
-    private function prepareContainer(ContainerBuilder $container)
+    protected function prepareContainer(ContainerBuilder $container)
     {
         $this
             ->registerApplication($container)
@@ -285,6 +285,85 @@ class Application
             ->registerInputManager($container)
             ->registerOutputManager($container)
         ;
+    }
+
+    /**
+     * Sets the default definition if it is not already set.
+     *
+     * The `$id` is prefixed with `SERVICE_ID`.
+     *
+     * @param ContainerBuilder $container  The container.
+     * @param string           $id         The service identifier.
+     * @param callable         $definition The definition builder.
+     *
+     * @return Application For method chaining.
+     */
+    protected function setDefinition(
+        ContainerBuilder $container,
+        $id,
+        callable $definition
+    ) {
+        $id = self::getId($id);
+
+        if (!$container->hasDefinition($id)) {
+            $container->setDefinition($id, $definition($container));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sets the default parameter value if it is not already set.
+     *
+     * The `$name` is prefixed with `SERVICE_ID`.
+     *
+     * @param ContainerBuilder $container The container.
+     * @param string           $name      The name of the parameter.
+     * @param mixed            $value     The value of the parameter.
+     *
+     * @return Application For method chaining.
+     */
+    protected function setParameter(ContainerBuilder $container, $name, $value)
+    {
+        $name = self::getId($name);
+
+        if (!$container->hasParameter($name)) {
+            $container->setParameter($name, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the list of bundled commands.
+     *
+     * @return array The list of bundled commands.
+     */
+    private function getBundledCommands()
+    {
+        $commands = array(
+            'config_current' => 'Box\Component\Console\Command\Config\CurrentCommand',
+            'config_reference' => 'Box\Component\Console\Command\Config\ReferenceCommand'
+        );
+
+        if (class_exists('Symfony\Bundle\FrameworkBundle\Command\ContainerDebugCommand')) {
+            $commands['debug_container'] = 'Box\Component\Console\Command\Debug\ContainerCommand';
+        }
+
+        return $commands;
+    }
+
+    /**
+     * Returns the list of bundled helpers.
+     *
+     * @return array The list of bundled helpers.
+     */
+    private function getBundledHelpers()
+    {
+        return array(
+            'xml' => 'Box\Component\Console\Helper\XmlHelper',
+            'yaml' => 'Box\Component\Console\Helper\YamlHelper'
+        );
     }
 
     /**
@@ -636,53 +715,6 @@ class Application
             )
 
         ;
-
-        return $this;
-    }
-
-    /**
-     * Sets the default definition if it is not already set.
-     *
-     * The `$id` is prefixed with `SERVICE_ID`.
-     *
-     * @param ContainerBuilder $container  The container.
-     * @param string           $id         The service identifier.
-     * @param callable         $definition The definition builder.
-     *
-     * @return Application For method chaining.
-     */
-    private function setDefinition(
-        ContainerBuilder $container,
-        $id,
-        callable $definition
-    ) {
-        $id = self::getId($id);
-
-        if (!$container->hasDefinition($id)) {
-            $container->setDefinition($id, $definition($container));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Sets the default parameter value if it is not already set.
-     *
-     * The `$name` is prefixed with `SERVICE_ID`.
-     *
-     * @param ContainerBuilder $container The container.
-     * @param string           $name      The name of the parameter.
-     * @param mixed            $value     The value of the parameter.
-     *
-     * @return Application For method chaining.
-     */
-    private function setParameter(ContainerBuilder $container, $name, $value)
-    {
-        $name = self::getId($name);
-
-        if (!$container->hasParameter($name)) {
-            $container->setParameter($name, $value);
-        }
 
         return $this;
     }
