@@ -60,7 +60,7 @@ class ContainerHelper extends Helper
     public function getContainerBuilder()
     {
         if (null === $this->file) {
-            throw CacheException::fileNotExist($this->file);
+            throw CacheException::fileNotExist($this->file); // @codeCoverageIgnore
         }
 
         $container = new ContainerBuilder();

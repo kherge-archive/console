@@ -18,6 +18,7 @@ class ContainerCommandTest extends CommandTestCase
      * Verifies that we can debug the service container.
      *
      * @covers \Box\Component\Console\Command\Debug\ContainerCommand
+     * @covers \Box\Component\Console\Helper\ContainerHelper
      *
      * @runInSeparateProcess
      */
