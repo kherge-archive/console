@@ -28,6 +28,8 @@ class ApplicationCacheTest extends TestCase
      * Verifies that we can create and reload a cached container.
      *
      * @covers \Box\Component\Console\ApplicationCache
+     *
+     * @runInSeparateProcess
      */
     public function testCache()
     {
