@@ -40,7 +40,7 @@ class ApplicationCache extends Application
      */
     public static function bootstrap(
         $file,
-        callable $setup,
+        callable $setup = null,
         $class = 'ConsoleContainer',
         $debug = true
     ) {
@@ -50,7 +50,9 @@ class ApplicationCache extends Application
             $container = new ContainerBuilder();
             $app = new self($container);
 
-            $setup($container);
+            if (null !== $setup) {
+                $setup($container);
+            }
 
             $app->save($file, $class, $debug);
         }
