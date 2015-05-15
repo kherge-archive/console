@@ -65,19 +65,21 @@ class CommandTestCase extends TestCase
      * @return integer The exit status.
      */
     public function runCommand(
-        InputInterface $input,
+        InputInterface $input = null,
         OutputInterface &$output = null
     ) {
+        if (($this->container instanceof ContainerBuilder)
+            && !$this->container->isFrozen()) {
+            $this->container->compile();
+        }
+
         if (null === $output) {
             $output = new StreamOutput(
                 fopen('php://memory', 'r+')
             );
         }
 
-        $this->container->set(Application::getId('input'), $input);
-        $this->container->set(Application::getId('output'), $output);
-
-        return $this->application->run();
+        return $this->application->run($input, $output);
     }
 
     /**

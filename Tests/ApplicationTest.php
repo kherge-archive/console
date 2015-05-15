@@ -7,7 +7,9 @@ use Box\Component\Console\Test\CommandTestCase;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Verifies that the class functions as intended.
@@ -51,14 +53,20 @@ class ApplicationTest extends CommandTestCase
             )
         ;
 
-        // make sure it does not exit
-        self::assertEquals(
-            0,
-            $this->runCommand(
-                new ArrayInput(array()),
-                $output
-            )
-        );
+        // register our own IO
+        $input = new ArrayInput(array());
+        $output = new StreamOutput(fopen('php://memory', 'r+'));
+
+        $this->container->set(Application::getId('input'), $input);
+        $this->container->set(Application::getId('output'), $output);
+
+        // compile the container ourselves
+        if ($this->container instanceof ContainerBuilder) {
+            $this->container->compile();
+        }
+
+        // make sure the exit status is returned
+        self::assertEquals(0, $this->application->run());
 
         // make sure it uses our output
         $output = $this->readOutput($output);
