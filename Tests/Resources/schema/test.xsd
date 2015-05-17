@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xsd:schema xmlns="http://symfony.com/schema/routing"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://symfony.com/schema/routing"
+    elementFormDefault="qualified">
+
+  <xsd:annotation>
+    <xsd:documentation><![CDATA[
+      Box Project Test Extension Schema
+      Authors: Kevin Herrera
+
+      This scheme defines the elements and attributes that can be used to define
+      the test configuration settings.
+    ]]></xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="test" type="test" />
+
+  <xsd:complexType name="test">
+    <xsd:choice minOccurs="0" maxOccurs="1">
+      <xsd:element name="alpha" type="xsd:string" />
+      <xsd:element name="beta" type="xsd:string" />
+      <xsd:element name="gamma" type="xsd:string" />
+    </xsd:choice>
+  </xsd:complexType>
+
+</xsd:schema>

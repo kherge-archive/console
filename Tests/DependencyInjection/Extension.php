@@ -23,6 +23,22 @@ class Extension extends Base
     /**
      * {@inheritdoc}
      */
+    public function getNamespace()
+    {
+        return 'http://box-project.org/schema/test';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getXsdValidationBasePath()
+    {
+        return __DIR__ . '/../Resources/schema';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function load(array $configs, ContainerBuilder $container)
     {
         /** @var Configuration $configuration */
