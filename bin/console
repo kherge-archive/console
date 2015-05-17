@@ -46,7 +46,7 @@ try {
 }
 
 // compile the new container
-$app->getContainer()->compile();
+$container->compile();
 
 // run the application without caching
 $app->run();
