@@ -622,6 +622,11 @@ debugging option will cause the cache to be refreshed if a resource is updated.
 By disabling debugging, the cache files must be manually deleted before any of
 the changes to the resources take effect.
 
+License
+-------
+
+This software is released under the MIT license.
+
 [Build Status]: https://travis-ci.org/box-project/console.png?branch=master
 [Latest Stable Version]: https://poser.pugx.org/box-project/console/v/stable.png
 [Latest Unstable Version]: https://poser.pugx.org/box-project/console/v/unstable.png
