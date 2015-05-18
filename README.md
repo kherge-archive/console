@@ -391,32 +391,32 @@ within the container. The following is a list of those parameters and services.
 
 ### Parameters
 
-| Name                               | Default Value                                                | Description                                               |
-|:-----------------------------------|:-------------------------------------------------------------|:----------------------------------------------------------|
-| box.console.auto_exit              | `true`                                                       | If `true`, `exit()` is called once a command finishes.    |
-| box.console.class                  | `Symfony\Component\Console\Application`                      | The class for the console application.                    |
-| box.console.command.*.class        | Instances of `Symfony\Component\Console\Command\Command`     | The class for each default command.                       |
-| box.console.event_dispatcher.class | `Symfony\Component\EventDispatcher\ContainerAwareDispatcher` | The class for the event dispatcher.                       |
-| box.console.helper.*.class         | Instances of `Symfony\Component\Console\Helper\Helper`       | The class for each default helper.                        |
-| box.console.helper.container.class | `Box\Component\Console\Helper\ContainerHelper`               | The class a helper that provides access to the container. |
-| box.console.helper_set.class       | `Symfony\Component\Console\Helper\HelperSet`                 | The class for the helper set.                             |
-| box.console.input.class            | `Symfony\Component\Console\Input\ArgvInput`                  | The class for the default input manager.                  |
-| box.console.name                   | `UNKNOWN`                                                    | The name of the console application.                      |
-| box.console.output.class           | `Symfony\Component\Console\Output\ConsoleOutput`             | The class for the default output manager.                 |
-| box.console.version                | `UNKNOWN`                                                    | The version of the console application.                   |
+| Name                                 | Default Value                                                | Description                                               |
+|:-------------------------------------|:-------------------------------------------------------------|:----------------------------------------------------------|
+| `box.console.auto_exit`              | `true`                                                       | If `true`, `exit()` is called once a command finishes.    |
+| `box.console.class`                  | `Symfony\Component\Console\Application`                      | The class for the console application.                    |
+| `box.console.command.*.class`        | Instances of `Symfony\Component\Console\Command\Command`     | The class for each default command.                       |
+| `box.console.event_dispatcher.class` | `Symfony\Component\EventDispatcher\ContainerAwareDispatcher` | The class for the event dispatcher.                       |
+| `box.console.helper.*.class`         | Instances of `Symfony\Component\Console\Helper\Helper`       | The class for each default helper.                        |
+| `box.console.helper.container.class` | `Box\Component\Console\Helper\ContainerHelper`               | The class a helper that provides access to the container. |
+| `box.console.helper_set.class`       | `Symfony\Component\Console\Helper\HelperSet`                 | The class for the helper set.                             |
+| `box.console.input.class`            | `Symfony\Component\Console\Input\ArgvInput`                  | The class for the default input manager.                  |
+| `box.console.name`                   | `UNKNOWN`                                                    | The name of the console application.                      |
+| `box.console.output.class`           | `Symfony\Component\Console\Output\ConsoleOutput`             | The class for the default output manager.                 |
+| `box.console.version`                | `UNKNOWN`                                                    | The version of the console application.                   |
 
 ### Services
 
-| Identifier                   | Class                                  | Description                                          |
-|:-----------------------------|:---------------------------------------|:-----------------------------------------------------|
-| box.console                  | `%box.console.class%`                  | The console application which contains all commands. |
-| box.console.helper.container | `%box.console.helper.container.class%` | A helper that provides access to the container.      |
-| box.console.command.*        | `%box.console.command.*.class%`        | A command.                                           |
-| box.console.helper.*         | `%box.console.helper.*.class%`         | A helper.                                            |
-| box.console.event_dispatcher | `%box.console.event_dispatcher.class%` | The event dispatcher.                                |
-| box.console.helper_set       | `%box.console.helper_set.class%`       | The helper set which contains all helpers.           |
-| box.console.input            | `%box.console.input.class%`            | The input manager.                                   |
-| box.console.output           | `%box.console.output.class%`           | The output manager.                                  |
+| Identifier                     | Class                                  | Description                                          |
+|:-------------------------------|:---------------------------------------|:-----------------------------------------------------|
+| `box.console`                  | `%box.console.class%`                  | The console application which contains all commands. |
+| `box.console.helper.container` | `%box.console.helper.container.class%` | A helper that provides access to the container.      |
+| `box.console.command.*`        | `%box.console.command.*.class%`        | A command.                                           |
+| `box.console.helper.*`         | `%box.console.helper.*.class%`         | A helper.                                            |
+| `box.console.event_dispatcher` | `%box.console.event_dispatcher.class%` | The event dispatcher.                                |
+| `box.console.helper_set`       | `%box.console.helper_set.class%`       | The helper set which contains all helpers.           |
+| `box.console.input`            | `%box.console.input.class%`            | The input manager.                                   |
+| `box.console.output`           | `%box.console.output.class%`           | The output manager.                                  |
 
 Performance
 -----------
