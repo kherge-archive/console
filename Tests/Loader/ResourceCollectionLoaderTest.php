@@ -77,6 +77,45 @@ class ResourceCollectionLoaderTest extends TestCase
     }
 
     /**
+     * Verifies that we can load an optional resource.
+     */
+    public function testLoadOptional()
+    {
+        file_put_contents(
+            $this->dir . '/test.yml.dist',
+            Yaml::dump(
+                array(
+                    'parameters' => array(
+                        'test' => 'value'
+                    )
+                )
+            )
+        );
+
+        self::assertFalse(
+            $this->loader->loadOptional(
+                new ResourceCollection(
+                    array(
+                        new Resource('test.yml')
+                    )
+                )
+            )
+        );
+
+        self::assertTrue(
+            $this->loader->loadOptional(
+                new ResourceCollection(
+                    array(
+                        new ResourceSupport('test.yml.dist', 'test.yml')
+                    )
+                )
+            )
+        );
+
+        self::assertEquals('value', $this->container->getParameter('test'));
+    }
+
+    /**
      * Verifies that an invalid resource throws an exception.
      */
     public function testLoadInvalid()

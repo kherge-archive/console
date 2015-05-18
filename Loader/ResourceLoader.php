@@ -2,6 +2,7 @@
 
 namespace Box\Component\Console\Loader;
 
+use InvalidArgumentException;
 use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
@@ -44,6 +45,43 @@ class ResourceLoader implements LoaderInterface
         } else {
             throw new FileLoaderLoadException($this->toString($resource)); // @codeCoverageIgnore
         }
+    }
+
+    /**
+     * Attempts to load a resource that may not exist.
+     *
+     * If the `$resource` exists, it will be loaded and `true` is returned.
+     * Otherwise, `false` is returned. An `InvalidArgumentException` exception
+     * will only be thrown if the resource fails to load because it is invalid.
+     *
+     * @param Resource $resource The resource to load.
+     *
+     * @return boolean Returns `true` if loaded, `false` if not.
+     *
+     * @throws InvalidArgumentException If the resource is invalid.
+     */
+    public function loadOptional($resource)
+    {
+        // @codeCoverageIgnoreStart
+        if (!($resource instanceof Resource)) {
+            throw new InvalidArgumentException(
+                'The resource "%s" is not an instance of "Resource".',
+                $this->toString($resource)
+            );
+        }
+        // @codeCoverageIgnoreEnd
+
+        try {
+            $this->load($resource);
+
+            return true;
+        } catch (InvalidArgumentException $exception) {
+            if (false === strpos($exception->getMessage(), 'does not exist')) {
+                throw $exception; // @codeCoverageIgnore
+            }
+        }
+
+        return false;
     }
 
     /**
