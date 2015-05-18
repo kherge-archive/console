@@ -136,6 +136,328 @@ debug
   debug:container    Displays current services for an application
 ```
 
+Using the Container
+-------------------
+
+`Application` is designed around the use of the container. All functionality
+that is provided by **Console** can be found as a parameter or service within
+the container. As a result, all changes to the console (adding commands, adding
+helpers, changing defaults, etc) must also occur through the container.
+
+### Loading Resources
+
+In order to make changes to the container, the loaders provided by the
+**DependencyInjection** library must be used. More information about how to
+use the [DI loaders][] can be found on Symfony's website. While you may use
+any compatible loader, **Console** will only officially support XML and YAML
+for file-based loading. PHP is also supported, but not in conjunction with
+the bundled commands or loaders.
+
+#### Loading `.dist` Files
+
+In addition to the standard loaders, **Console** provides its own loader for
+special cases. Many applications make use of files that end with `.dist`. This
+file extension is used to indicate that the file is part of the distribution.
+A user may then make a copy of the file, drop the `.dist` extension, and use
+their version of the file with their software.
+
+The following example will support the loading of XML and YAML files, with or
+without the `.dist` file extension.
+
+```php
+use Box\Component\Console\Loader\Resource;
+use Box\Component\Console\Loader\ResourceCollection;
+use Box\Component\Console\Loader\ResourceCollectionLoader;
+use Box\Component\Console\Loader\ResourceSupport;
+use Symfony\Component\Config\Exception\FileLoaderLoadException;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+
+// load files from the current directory
+$locator = new FileLocator('.');
+
+// create a loader for xml and yaml files
+$loader = new ResourceCollectionLoader(
+    new LoaderResolver(
+        array(
+            new XmlFileLoader($container, $locator),
+            new YamlFileLoader($container, $locator)
+        )
+    )
+);
+
+// load the first available file from a collection of possible resources
+$loader->load(
+    new ResourceCollection(
+        array(
+            new Resource('example.xml'),
+            new ResourceSupport('example.xml.dist', 'example.xml'),
+            new Resource('example.yml'),
+            new ResourceSupport('example.yml.dist', 'example.yml')
+        )
+    )
+);
+```
+
+As the name implies, the `ResourceCollection` class manages a collection of
+`Resource` instances. Because of how the standard file loaders behave when
+determining support for files, `ResourceSupport` is used to map an unsupported
+file extension (e.g. `.yml.dist`) a supported one (e.g. `.yml`). The loader,
+`ResourceCollectionLoader`, will then iterate through the collection attempting
+load each resource until one is successfully loaded. If the first resource in
+the collection fails to load due to it not existing, the next will be attempted.
+This iteration will continue until the list is exhausted, or an error is found
+while processing an available resource. 
+
+In the example above, an exception is thrown if none of the resources in the
+collection exist. To optionally load a resource, without having an exception
+thrown, the `loadOptional()` method should be used.
+
+```php
+$loader->loadOptional(
+    new ResourceCollection(
+        array(
+            new Resource('example.xml'),
+            new ResourceSupport('example.xml.dist', 'example.xml'),
+            new Resource('example.yml'),
+            new ResourceSupport('example.yml.dist', 'example.yml')
+        )
+    )
+);
+```
+
+### Registering Commands
+
+To register a command, you must tag its service with "box.console.command".
+
+#### In PHP
+
+```php
+$definition = new Definition('My\Command');
+$definition->addTag('box.console.command');
+
+$container->setDefinition('my_command', $definition);
+```
+
+#### In XML
+
+```xml
+<container>
+  <services>
+    <service class="My\Command" id="my_command">
+      <tag name="box.console.command"/>
+    </service>
+  </services>
+</container>
+```
+
+#### In YAML
+
+```yaml
+services:
+
+    my_command:
+        class: My\Command
+        tags:
+            - { name: box.console.command }
+```
+
+### Registering Helpers
+
+To register a command, you must tag its service with "box.console.helper".
+
+#### In PHP
+
+```php
+$definition = new Definition('My\Helper');
+$definition->addTag('box.console.helper');
+
+$container->setDefinition('my_helper', $definition);
+```
+
+#### In XML
+
+```xml
+<container>
+  <services>
+    <service class="My\Helper" id="my_helper">
+      <tag name="box.console.helper"/>
+    </service>
+  </services>
+</container>
+```
+
+#### In YAML
+
+```yaml
+services:
+
+    my_helper:
+        class: My\Helper
+        tags:
+            - { name: box.console.helper }
+```
+
+### Registering Event Listeners and Subscribers
+
+The **EventDispatcher** library supports the registration of listeners, or a
+collection of listeners through what is known as a "subscriber". A listener
+is a single callable, while a subscriber is a class that returns a list of
+which methods must be called when specific events a dispatched.
+
+#### Listeners
+
+##### In PHP
+
+```php
+$definition = new Definition('My\Listener');
+$definition->addTag(
+    'box.console.event.listener',
+    array(
+        'event' => 'the.event',
+        'method' => 'onEvent'
+    )
+);
+
+$container->setDefinition('my_listener', $definition);
+```
+
+##### In XML
+
+```xml
+<container>
+  <services>
+    <service class="My\Listener" id="my_listener">
+      <tag name="box.console.event.listener" event="the.event" method="onEvent"/>
+    </service>
+  </services>
+</container>
+```
+
+##### In YAML
+
+```yaml
+services:
+
+    my_listener:
+        class: My\Listener
+        tags:
+            - name: box.console.event.listener
+              event: the.event
+              method: onEvent
+```
+
+#### Subscribers
+
+##### In PHP
+
+```php
+$definition = new Definition('My\Subscriber');
+$definition->addTag('box.console.event.subscriber');
+
+$container->setDefinition('my_subscriber', $definition);
+```
+
+##### In XML
+
+```xml
+<container>
+  <services>
+    <service class="My\Subscriber" id="my_subscriber">
+      <tag name="box.console.event.subscriber"/>
+    </service>
+  </services>
+</container>
+```
+
+##### In YAML
+
+```yaml
+services:
+
+    my_subscriber:
+        class: My\Subscriber
+        tags:
+            - { name: box.console.event.subscriber }
+```
+
+The Defaults
+------------
+
+As mentioned early in **Getting Started**, when a `ContainerBuilder` instance
+is passed to `Application`, a set of default parameters and services are set
+within the container. The following is a list of those parameters and services.
+
+### Parameters
+
+| Name                               | Default Value                                                | Description                                               |
+|:-----------------------------------|:-------------------------------------------------------------|:----------------------------------------------------------|
+| box.console.auto_exit              | `true`                                                       | If `true`, `exit()` is called once a command finishes.    |
+| box.console.class                  | `Symfony\Component\Console\Application`                      | The class for the console application.                    |
+| box.console.command.*.class        | Instances of `Symfony\Component\Console\Command\Command`     | The class for each default command.                       |
+| box.console.event_dispatcher.class | `Symfony\Component\EventDispatcher\ContainerAwareDispatcher` | The class for the event dispatcher.                       |
+| box.console.helper.*.class         | Instances of `Symfony\Component\Console\Helper\Helper`       | The class for each default helper.                        |
+| box.console.helper.container.class | `Box\Component\Console\Helper\ContainerHelper`               | The class a helper that provides access to the container. |
+| box.console.helper_set.class       | `Symfony\Component\Console\Helper\HelperSet`                 | The class for the helper set.                             |
+| box.console.input.class            | `Symfony\Component\Console\Input\ArgvInput`                  | The class for the default input manager.                  |
+| box.console.name                   | `UNKNOWN`                                                    | The name of the console application.                      |
+| box.console.output.class           | `Symfony\Component\Console\Output\ConsoleOutput`             | The class for the default output manager.                 |
+| box.console.version                | `UNKNOWN`                                                    | The version of the console application.                   |
+
+### Services
+
+| Identifier                   | Class                                  | Description                                          |
+|:-----------------------------|:---------------------------------------|:-----------------------------------------------------|
+| box.console                  | `%box.console.class%`                  | The console application which contains all commands. |
+| box.console.helper.container | `%box.console.helper.container.class%` | A helper that provides access to the container.      |
+| box.console.command.*        | `%box.console.command.*.class%`        | A command.                                           |
+| box.console.helper.*         | `%box.console.helper.*.class%`         | A helper.                                            |
+| box.console.event_dispatcher | `%box.console.event_dispatcher.class%` | The event dispatcher.                                |
+| box.console.helper_set       | `%box.console.helper_set.class%`       | The helper set which contains all helpers.           |
+| box.console.input            | `%box.console.input.class%`            | The input manager.                                   |
+| box.console.output           | `%box.console.output.class%`           | The output manager.                                  |
+
+Performance
+-----------
+
+The processing of building a container can potentially be time consuming and
+costly in terms of performance. **Console** provides a way to cache the results
+of the container building process so that subsequent uses of the application can
+be faster.
+
+```php
+use Box\Component\Console\ApplicationCache;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+ApplicationCache::bootstrap(
+    '/path/to/cache/example.php',
+    function (ContainerBuilder $container) {
+        // first-run container building
+    },
+    'MyCachedContainer', // name of cached container class
+    true                 // toggle debugging
+);
+```
+
+The `ApplicationCache::bootstrap()` method manages the process of creating,
+loading, and saving the container. When the application is first run using this
+method, the following files are created. It is important to note that the name
+of the generated files will vary depending on what you provided as the first
+argument to `bootstrap()`.
+
+| File             | Description                                                               |
+|:-----------------|:--------------------------------------------------------------------------|
+| example.php      | The cached container.                                                     |
+| example.php.meta | The cache metadata, used to determine if the cache needs to be refreshed. |
+| example.xml      | The container configuration used for debugging.                           |
+
+By default, the name of the cached container class is `ConsoleContainer` and
+resides in the root namespace. Also by default, "debugging" is enabled. The
+debugging option will cause the cache to be refreshed if a resource is updated.
+By disabling debugging, the cache files must be manually deleted before any of
+the changes to the resources take effect.
+
 [Build Status]: https://travis-ci.org/box-project/console.png?branch=master
 [Latest Stable Version]: https://poser.pugx.org/box-project/console/v/stable.png
 [Latest Unstable Version]: https://poser.pugx.org/box-project/console/v/unstable.png
@@ -144,6 +466,8 @@ debug
 [dependency injection]: http://en.wikipedia.org/wiki/Dependency_injection
 [mediator]: http://en.wikipedia.org/wiki/Mediator_pattern
 [Compiling]: http://symfony.com/doc/current/components/dependency_injection/compilation.html
+[DI loaders]: http://symfony.com/doc/current/components/dependency_injection/introduction.html#setting-up-the-container-with-configuration-files
+[listener and subscriber registration]: 
 
 [Console]: http://symfony.com/doc/current/components/console/index.html
 [DependencyInjection]: http://symfony.com/doc/current/components/dependency_injection/index.html
