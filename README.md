@@ -578,9 +578,9 @@ within the container. The following is a list of those parameters and services.
 
 ### Helpers
 
-| Helper   | Description                       |
-|:---------|:----------------------------------|
-| `helper` | Provides access to the container. |
+| Helper      | Description                       |
+|:------------|:----------------------------------|
+| `container` | Provides access to the container. |
 
 Performance
 -----------
