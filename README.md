@@ -467,7 +467,6 @@ the changes to the resources take effect.
 [mediator]: http://en.wikipedia.org/wiki/Mediator_pattern
 [Compiling]: http://symfony.com/doc/current/components/dependency_injection/compilation.html
 [DI loaders]: http://symfony.com/doc/current/components/dependency_injection/introduction.html#setting-up-the-container-with-configuration-files
-[listener and subscriber registration]: 
 
 [Console]: http://symfony.com/doc/current/components/console/index.html
 [DependencyInjection]: http://symfony.com/doc/current/components/dependency_injection/index.html
