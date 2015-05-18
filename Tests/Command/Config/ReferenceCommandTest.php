@@ -48,6 +48,8 @@ class ReferenceCommandTest extends CommandTestCase
         // verify that the current configuration is shown in yaml by default
         self::assertEquals(
             <<<CURRENT
+
+# The test configuration settings.
 test:
 
     # The alpha setting.
@@ -84,6 +86,7 @@ CURRENT
         // verify that the current configuration is shown in yaml by default
         self::assertEquals(
             <<<CURRENT
+<!-- The test configuration settings. -->
 <!-- Namespace: http://example.org/schema/dic/test -->
 <!-- alpha: The alpha setting. -->
 <!-- beta: The beta setting. -->

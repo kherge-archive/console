@@ -34,6 +34,7 @@ class Configuration implements ConfigurationInterface, DefaultsInterface
 
         /** @noinspection PhpUndefinedMethodInspection */
         $root
+            ->info('The test configuration settings.')
             ->children()
                 ->scalarNode('alpha')
                     ->info('The alpha setting.')
