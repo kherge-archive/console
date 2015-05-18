@@ -391,32 +391,181 @@ within the container. The following is a list of those parameters and services.
 
 ### Parameters
 
-| Name                                 | Default Value                                                | Description                                               |
-|:-------------------------------------|:-------------------------------------------------------------|:----------------------------------------------------------|
-| `box.console.auto_exit`              | `true`                                                       | If `true`, `exit()` is called once a command finishes.    |
-| `box.console.class`                  | `Symfony\Component\Console\Application`                      | The class for the console application.                    |
-| `box.console.command.*.class`        | Instances of `Symfony\Component\Console\Command\Command`     | The class for each default command.                       |
-| `box.console.event_dispatcher.class` | `Symfony\Component\EventDispatcher\ContainerAwareDispatcher` | The class for the event dispatcher.                       |
-| `box.console.helper.*.class`         | Instances of `Symfony\Component\Console\Helper\Helper`       | The class for each default helper.                        |
-| `box.console.helper.container.class` | `Box\Component\Console\Helper\ContainerHelper`               | The class a helper that provides access to the container. |
-| `box.console.helper_set.class`       | `Symfony\Component\Console\Helper\HelperSet`                 | The class for the helper set.                             |
-| `box.console.input.class`            | `Symfony\Component\Console\Input\ArgvInput`                  | The class for the default input manager.                  |
-| `box.console.name`                   | `UNKNOWN`                                                    | The name of the console application.                      |
-| `box.console.output.class`           | `Symfony\Component\Console\Output\ConsoleOutput`             | The class for the default output manager.                 |
-| `box.console.version`                | `UNKNOWN`                                                    | The version of the console application.                   |
+<table>
+  <thead>
+    <tr>
+      <th>Name (Default Value)</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>box.console.auto_exit</code>
+        <br/>
+        (<code>true</code>)
+      </td>
+      <td>If <code>true</code>, <code>exit()</code> is called once a command finishes.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.class</code>
+        <br/>
+        (<code>Symfony\Component\Console\Application</code>)
+      </td>
+      <td>The class for the console application.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.command.*.class</code>
+        <br/>
+        (Instances of <code>Symfony\Component\Console\Command\Command</code>)
+      </td>
+      <td>The class for each default command.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.event_dispatcher.class</code>
+        <br/>
+        (<code>Symfony\Component\EventDispatcher\ContainerAwareDispatcher</code>)
+      </td>
+      <td>The class for the event dispatcher.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.helper.*.class</code>
+        <br/>
+        (Instances of <code>Symfony\Component\Console\Helper\Helper</code>)
+      </td>
+      <td>The class for each default helper.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.helper.container.class</code>
+        <br/>
+        (<code>Box\Component\Console\Helper\ContainerHelper</code>)
+      </td>
+      <td>The class a helper that provides access to the container.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.helper_set.class</code>
+        <br/>
+        (<code>Symfony\Component\Console\Helper\HelperSet</code>)
+      </td>
+      <td>The class for the helper set.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.input.class</code>
+        <br/>
+        (<code>Symfony\Component\Console\Input\ArgvInput</code>)
+      </td>
+      <td>The class for the default input manager.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.name</code>
+        <br/>
+        (<code>UNKNOWN</code>)
+      </td>
+      <td>The name of the console application.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.output.class</code>
+        <br/>
+        (<code>Symfony\Component\Console\Output\ConsoleOutput</code>)
+      </td>
+      <td>The class for the default output manager.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.version</code>
+        <br/>
+        (<code>UNKNOWN</code>)
+      </td>
+      <td>The version of the console application.</td>
+    </tr>
+  </tbody>
+</table>
 
 ### Services
 
-| Identifier                     | Class                                  | Description                                          |
-|:-------------------------------|:---------------------------------------|:-----------------------------------------------------|
-| `box.console`                  | `%box.console.class%`                  | The console application which contains all commands. |
-| `box.console.helper.container` | `%box.console.helper.container.class%` | A helper that provides access to the container.      |
-| `box.console.command.*`        | `%box.console.command.*.class%`        | A command.                                           |
-| `box.console.helper.*`         | `%box.console.helper.*.class%`         | A helper.                                            |
-| `box.console.event_dispatcher` | `%box.console.event_dispatcher.class%` | The event dispatcher.                                |
-| `box.console.helper_set`       | `%box.console.helper_set.class%`       | The helper set which contains all helpers.           |
-| `box.console.input`            | `%box.console.input.class%`            | The input manager.                                   |
-| `box.console.output`           | `%box.console.output.class%`           | The output manager.                                  |
+<table>
+  <thead>
+    <tr>
+      <th>Identifier (Class)</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>box.console</code>
+        <br/>
+        (<code>%box.console.class%</code>)
+      </td>
+      <td>The console application which contains all commands.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.helper.container</code>
+        <br/>
+        (<code>%box.console.helper.container.class%</code>)
+      </td>
+      <td>A helper that provides access to the container.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.command.*</code>
+        <br/>
+        (<code>%box.console.command.*.class%</code>)
+      </td>
+      <td>A command.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.helper.*</code>
+        <br/>
+        (<code>%box.console.helper.*.class%</code>)
+      </td>
+      <td>A helper.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.event_dispatcher</code>
+        <br/>
+        (<code>%box.console.event_dispatcher.class%</code>)
+      </td>
+      <td>The event dispatcher.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.helper_set</code>
+        <br/>
+        (<code>%box.console.helper_set.class%</code>)
+      </td>
+      <td>The helper set which contains all helpers.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.input</code>
+        <br/>
+        (<code>%box.console.input.class%</code>)
+      </td>
+      <td>The input manager.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>box.console.output</code>
+        <br/>
+        (<code>%box.console.output.class%</code>)
+      </td>
+      <td>The output manager.</td>
+    </tr>
+  </tbody>
+</table>
 
 Performance
 -----------
@@ -446,11 +595,11 @@ method, the following files are created. It is important to note that the name
 of the generated files will vary depending on what you provided as the first
 argument to `bootstrap()`.
 
-| File             | Description                                                               |
-|:-----------------|:--------------------------------------------------------------------------|
-| example.php      | The cached container.                                                     |
-| example.php.meta | The cache metadata, used to determine if the cache needs to be refreshed. |
-| example.xml      | The container configuration used for debugging.                           |
+| File               | Description                                                               |
+|:-------------------|:--------------------------------------------------------------------------|
+| `example.php`      | The cached container.                                                     |
+| `example.php.meta` | The cache metadata, used to determine if the cache needs to be refreshed. |
+| `example.xml`      | The container configuration used for debugging.                           |
 
 By default, the name of the cached container class is `ConsoleContainer` and
 resides in the root namespace. Also by default, "debugging" is enabled. The
