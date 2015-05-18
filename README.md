@@ -567,6 +567,21 @@ within the container. The following is a list of those parameters and services.
   </tbody>
 </table>
 
+### Commands
+
+| Command            | Description                                                                                                                       |
+|:-------------------|:----------------------------------------------------------------------------------------------------------------------------------|
+| `config:current`   | Displays the current configuration for an extension registered with the container.                                                |
+| `config:list`      | Displays the list of extensions registered with the container.                                                                    |
+| `config:reference` | Displays the reference configuration for an extension registered with the container.                                              |
+| `debug:container`  | Displays the parameters and services in the container. This command is only available if `symfony/framework-bundle` is installed. |
+
+### Helpers
+
+| Helper   | Description                       |
+|:---------|:----------------------------------|
+| `helper` | Provides access to the container. |
+
 Performance
 -----------
 
