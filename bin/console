@@ -7,7 +7,6 @@ use Box\Component\Console\Loader\ResourceCollection;
 use Box\Component\Console\Loader\ResourceCollectionLoader;
 use Box\Component\Console\Loader\ResourceSupport;
 use Box\Component\Console\Tests\DependencyInjection\Extension;
-use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -40,22 +39,16 @@ $loader = new ResourceCollectionLoader(
     )
 );
 
-try {
-    $loader->load(
-        new ResourceCollection(
-            array(
-                new Resource('test.xml'),
-                new ResourceSupport('test.xml.dist', 'test.xml'),
-                new Resource('test.yml'),
-                new ResourceSupport('test.yml.dist', 'test.yml')
-            )
+$loader->loadOptional(
+    new ResourceCollection(
+        array(
+            new Resource('test.xml'),
+            new ResourceSupport('test.xml.dist', 'test.xml'),
+            new Resource('test.yml'),
+            new ResourceSupport('test.yml.dist', 'test.yml')
         )
-    );
-} catch (FileLoaderLoadException $exception) {
-    if (false === strpos($exception->getMessage(), 'Cannot load resource')) {
-        throw $exception;
-    }
-}
+    )
+);
 
 // compile the new container
 $container->compile();
