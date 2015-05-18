@@ -24,35 +24,6 @@ $container->compile()
 $application->run();
 ```
 
-```
-$ ./example
-Console Tool
-
-Usage:
-  [options] command [arguments]
-
-Options:
-  --help           -h Display this help message
-  --quiet          -q Do not output any message
-  --verbose        -v|vv|vvv Increase the verbosity of [snip]
-  --version        -V Display this application version
-  --ansi              Force ANSI output
-  --no-ansi           Disable ANSI output
-  --no-interaction -n Do not ask any interactive question
-
-Available commands:
-  help               Displays help for a command
-  list               Lists commands
-config
-  config:current     Displays the current configuration
-  config:list        Lists the registered extensions
-  config:reference   Displays a configuration reference
-container
-  container:debug    Displays current services for an application
-debug
-  debug:container    Displays current services for an application
-```
-
 Requirements
 ------------
 
@@ -72,7 +43,7 @@ Requirements
 Getting Started
 ---------------
 
-You must be familiar with some of the third-party libraries that are used by
+You need to be familiar with some of the third-party libraries that are used by
 Console in order to be able to make sense of anything. These libraries come from
 [Symfony][], an open source web application framework. For your convenience, the
 documentation for the most relevant libraries are linked below.
@@ -80,61 +51,62 @@ documentation for the most relevant libraries are linked below.
 - [Console][] - Manages all aspects of the console (input and output). When you
   author your commands you will be targeting this library.
 - [DependencyInjection][] - Responsible for wiring all of the dependencies
-  together.
+  together. Also makes it possible to alter the defaults provided by the
+  library to better suit your needs.
 - [EventDispatcher][] - A simple implementation of the [mediator][] pattern.
-  Enables events in the **Console** library, and makes it possible to add a
+  Enables events in the **Console** library and makes it possible to add a
   plugin system to your console application.
 
 ### Creating an Application
 
-To create a new application, you will first need to create a new container.
+```php
+use Box\Component\Console\Application;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+```
+
+Before a new application can be created, a dependency injection container will
+be needed. While any instance of `ContainerInterface` may be used, we will be
+using an instance of `ContainerBuilder` (more detail on why later).
 
 ```php
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 $container = new ContainerBuilder();
 ```
 
-Next, you need to create a new application using the container.
+With the container, a new `Application` instance can now be created.
 
 ```php
-use Box\Component\Console\Application;
-
 $app = new Application($container);
 ```
 
 When an instance of `ContainerBuilder` is provided to `Application`, it will
 automatically set parameters and register services needed to run the console
 application. `Application` will not set parameters or register services that
-already exist.
+already exist. It is important to note that only instances of `ContainerBuilder`
+will cause `Application` to set the default parameters and register the default
+services.
 
 ### Running an Application
 
-Once you have created your application, you will need to compile the container
-before you run the application. This gives the container a chance to perform
-some last minute processing.
+Before we can begin process of running the console, the container must first be
+compiled. [Compiling][] the container allows for some last minute processes to
+occur.
 
 ```php
 $container->compile();
-
-$app->run();
 ```
 
-Putting it all together in a script called **example**, it should look something
-like the following example.
+With the compiled container, the application is ready to run.
 
 ```php
-use Box\Component\Console\Application;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-$container = new ContainerBuilder();
-$app = new Application($container);
-
-$container->compile();
 $app->run();
 ```
 
-When you run **example**, you should see the following output.
+When the code in the examples above are run from a script in the command line,
+the following output will be shown. It may be important to note that the output
+may vary slightly depending on the age of the documentation and what libraries
+were installed in addition to **Console**.
 
 ```
 Console Tool
@@ -145,7 +117,7 @@ Usage:
 Options:
   --help           -h Display this help message
   --quiet          -q Do not output any message
-  --verbose        -v|vv|vvv Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+  --verbose        -v|vv|vvv Increase the verbosity of messages: [...snip...]
   --version        -V Display this application version
   --ansi              Force ANSI output
   --no-ansi           Disable ANSI output
@@ -171,6 +143,7 @@ debug
 
 [dependency injection]: http://en.wikipedia.org/wiki/Dependency_injection
 [mediator]: http://en.wikipedia.org/wiki/Mediator_pattern
+[Compiling]: http://symfony.com/doc/current/components/dependency_injection/compilation.html
 
 [Console]: http://symfony.com/doc/current/components/console/index.html
 [DependencyInjection]: http://symfony.com/doc/current/components/dependency_injection/index.html
