@@ -1,3 +1,8 @@
+[![Build Status][]](https://travis-ci.org/box-project/console)
+[![Latest Stable Version][]](https://packagist.org/packages/box-project/console)
+[![Latest Unstable Version][]](https://packagist.org/packages/box-project/console)
+[![Total Downloads][]](https://packagist.org/packages/box-project/console)
+
 Console
 =======
 
@@ -158,6 +163,11 @@ container
 debug
   debug:container    Displays current services for an application
 ```
+
+[Build Status]: https://travis-ci.org/box-project/console.png?branch=master
+[Latest Stable Version]: https://poser.pugx.org/box-project/console/v/stable.png
+[Latest Unstable Version]: https://poser.pugx.org/box-project/console/v/unstable.png
+[Total Downloads]: https://poser.pugx.org/box-project/console/downloads.png
 
 [dependency injection]: http://en.wikipedia.org/wiki/Dependency_injection
 [mediator]: http://en.wikipedia.org/wiki/Mediator_pattern
