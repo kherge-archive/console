@@ -2,9 +2,13 @@
 <?php
 
 use Box\Component\Console\Application;
+use Box\Component\Console\Loader\Resource;
+use Box\Component\Console\Loader\ResourceCollection;
+use Box\Component\Console\Loader\ResourceCollectionLoader;
+use Box\Component\Console\Loader\ResourceSupport;
 use Box\Component\Console\Tests\DependencyInjection\Extension;
+use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -27,7 +31,7 @@ $container->loadFromExtension($extension->getAlias());
 
 // load test configuration if available
 $locator = new FileLocator(array('.'));
-$loader = new DelegatingLoader(
+$loader = new ResourceCollectionLoader(
     new LoaderResolver(
         array(
             new XmlFileLoader($container, $locator),
@@ -37,11 +41,19 @@ $loader = new DelegatingLoader(
 );
 
 try {
-    $loader->load('test.xml');
-} catch (InvalidArgumentException $exception) {
-    try {
-        $loader->load('test.yml');
-    } catch (InvalidArgumentException $exception) {
+    $loader->load(
+        new ResourceCollection(
+            array(
+                new Resource('test.xml'),
+                new ResourceSupport('test.xml.dist', 'test.xml'),
+                new Resource('test.yml'),
+                new ResourceSupport('test.yml.dist', 'test.yml')
+            )
+        )
+    );
+} catch (FileLoaderLoadException $exception) {
+    if (false === strpos($exception->getMessage(), 'Cannot load resource')) {
+        throw $exception;
     }
 }
 
