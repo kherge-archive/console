@@ -1,6 +1,6 @@
 {
     "name": "box-project/console",
-    "description": "A console application assembled through dependency injection",
+    "description": "A console application assembled through dependency injection.",
     "keywords": ["console", "dependency", "injection"],
     "license": "MIT",
     "homepage": "http://box-project.org",
