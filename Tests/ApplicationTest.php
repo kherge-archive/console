@@ -50,7 +50,7 @@ class ApplicationTest extends CommandTestCase
             Yaml::dump(
                 array(
                     'test' => array(
-                        'notValid' => 123
+                        'alpha' => 'changed'
                     )
                 )
             )
@@ -81,14 +81,18 @@ class ApplicationTest extends CommandTestCase
 
         $loader->load('test.yml');
 
-        // make an exception is thrown because the configuration is invalid
-        $this->setExpectedException(
-            'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-            'Unrecognized option "notValid" under "test"'
-        );
-
         $this->application->loadFromExtensions();
         $this->container->compile();
+
+        // make sure the settings were loaded
+        self::assertEquals(
+            array(
+                'alpha' => 'changed',
+                'beta' => 2,
+                'gamma' => true
+            ),
+            $this->container->getParameter('current.settings')
+        );
     }
 
     /**
