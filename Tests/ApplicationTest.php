@@ -4,12 +4,16 @@ namespace Box\Component\Console\Tests;
 
 use Box\Component\Console\Application;
 use Box\Component\Console\Test\CommandTestCase;
+use Box\Component\Console\Tests\DependencyInjection\Extension;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Verifies that the class functions as intended.
@@ -33,6 +37,58 @@ class ApplicationTest extends CommandTestCase
         $app = new Application($container);
 
         self::assertSame($container, $app->getContainer());
+    }
+
+    /**
+     * Verifies that we can register extensions and load configuration data.
+     */
+    public function testExtension()
+    {
+        // create invalid configuration
+        file_put_contents(
+            $this->configDir . '/test.yml',
+            Yaml::dump(
+                array(
+                    'test' => array(
+                        'notValid' => 123
+                    )
+                )
+            )
+        );
+
+        // register the extension
+        $this->application->registerExtension(new Extension());
+
+        // verify that the extension is registered as a service
+        self::assertEquals(
+            'Box\Component\Console\Tests\DependencyInjection\Extension',
+            $this->container->getParameter(
+                Application::getId('extension.test.class')
+            )
+        );
+
+        self::assertTrue(
+            $this
+                ->container
+                ->hasDefinition(Application::getId('extension.test'))
+        );
+
+        // load some test configuration
+        $loader = new YamlFileLoader(
+            $this->container,
+            new FileLocator($this->configDir)
+        );
+
+        $loader->load('test.yml');
+
+        // make an exception is thrown because the configuration is invalid
+        $this->setExpectedException(
+            'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+            'Unrecognized option "notValid" under "test"'
+        );
+
+        $this->application->loadFromExtensions();
+        $this->container->compile();
     }
 
     /**

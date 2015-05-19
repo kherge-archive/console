@@ -4,6 +4,7 @@ namespace Box\Component\Console;
 
 use Box\Component\Console\DependencyInjection\Compiler\CommandPass;
 use Box\Component\Console\DependencyInjection\Compiler\HelperPass;
+use Box\Component\Console\Exception\ApplicationException;
 use Box\Component\Console\Exception\DefinitionException;
 use ReflectionMethod;
 use Symfony\Component\Console\Command\Command;
@@ -14,6 +15,7 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 
@@ -74,6 +76,65 @@ class Application
         }
 
         return 'box.console.' . $id;
+    }
+
+    /**
+     * Loads the configuration from the registered extensions.
+     *
+     * @return Application For method chaining.
+     */
+    public function loadFromExtensions()
+    {
+        if (!($this->container instanceof ContainerBuilder)) {
+            throw ApplicationException::notContainerBuilder(); // @codeCoverageIgnore
+        }
+
+        foreach ($this->container->getExtensions() as $extension) {
+            $this->container->loadFromExtension($extension->getAlias());
+        }
+
+        return $this;
+    }
+
+    /**
+     * Registers a container extension.
+     *
+     * @param ExtensionInterface $extension The container extension.
+     *
+     * @return Application For method chaining.
+     *
+     * @throws ApplicationException If the extension could not be registered.
+     */
+    public function registerExtension(ExtensionInterface $extension)
+    {
+        if (!($this->container instanceof ContainerBuilder)) {
+            throw ApplicationException::notContainerBuilder();  // @codeCoverageIgnore
+        }
+
+        $this->container->registerExtension($extension);
+
+        $this->setDefinition(
+            $this->container,
+            'extension.' . $extension->getAlias(),
+            function (ContainerBuilder $container) use ($extension) {
+                $alias = $extension->getAlias();
+
+                $container->setParameter(
+                    self::getId("extension.$alias.class"),
+                    get_class($extension)
+                );
+
+                $definition = new Definition(
+                    '%' . self::getId("extension.$alias.class") . '%'
+                );
+
+                $definition->addTag(self::getId('extension'));
+
+                return $definition;
+            }
+        );
+
+        return $this;
     }
 
     /**

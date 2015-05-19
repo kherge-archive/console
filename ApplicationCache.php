@@ -51,10 +51,12 @@ class ApplicationCache extends Application
             $app = new static($container);
 
             if (null !== $setup) {
-                $setup($container);
+                $setup($container, $app);
             }
 
-            $app->save($file, $class, $debug);
+            $app
+                ->loadFromExtensions()
+                ->save($file, $class, $debug);
         }
 
         return $app;

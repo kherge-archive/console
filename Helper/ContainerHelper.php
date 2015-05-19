@@ -2,6 +2,7 @@
 
 namespace Box\Component\Console\Helper;
 
+use Box\Component\Console\Application;
 use Box\Component\Console\Exception\CacheException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Helper\Helper;
@@ -67,6 +68,14 @@ class ContainerHelper extends Helper
 
         $loader = new XmlFileLoader($container, new FileLocator());
         $loader->load($this->file);
+
+        $extensions = $container->findTaggedServiceIds(
+            Application::getId('extension')
+        );
+
+        foreach ($extensions as $id => $tag) {
+            $container->registerExtension($container->get($id));
+        }
 
         return $container;
     }
