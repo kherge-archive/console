@@ -48,7 +48,7 @@ class ApplicationCache extends Application
             $app = self::load($file, $class, $debug);
         } catch (CacheException $exception) {
             $container = new ContainerBuilder();
-            $app = new self($container);
+            $app = new static($container);
 
             if (null !== $setup) {
                 $setup($container);
@@ -92,7 +92,7 @@ class ApplicationCache extends Application
             throw CacheException::classNotExist($class, $file); // @codeCoverageIgnore
         }
 
-        return new self(new $class());
+        return new static(new $class());
     }
 
     /**
