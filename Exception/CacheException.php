@@ -28,6 +28,20 @@ class CacheException extends RuntimeException
     }
 
     /**
+     * Creates a new exception for when a directory could not be created.
+     *
+     * @param string $dir The cache directory path.
+     *
+     * @return CacheException The new exception.
+     */
+    public static function cannotCreateDir($dir)
+    {
+        return new self(
+            "The cache directory \"$dir\" could not be created."
+        );
+    }
+
+    /**
      * Creates a new exception for when a class does not exist in the file.
      *
      * @param string $class The name of the class.

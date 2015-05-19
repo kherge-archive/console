@@ -48,7 +48,7 @@ class ApplicationCacheTest extends TestCase
             )
         );
 
-        $cache = $this->dir . '/cache.php';
+        $cache = $this->dir . '/new/cache.php';
 
         // bootstrap the application
         $app = ApplicationCache::bootstrap(
@@ -72,18 +72,18 @@ class ApplicationCacheTest extends TestCase
         self::assertEquals('test version', $console->getVersion());
 
         // make sure the cache files were created
-        self::assertFileExists($this->dir . '/cache.php');
-        self::assertFileExists($this->dir . '/cache.php.meta');
+        self::assertFileExists($this->dir . '/new/cache.php');
+        self::assertFileExists($this->dir . '/new/cache.php.meta');
 
         // change the cache file times so it isn't immediately treated as stale
         touch(
-            $this->dir . '/cache.php',
-            filemtime($this->dir . '/cache.php') + 1
+            $this->dir . '/new/cache.php',
+            filemtime($this->dir . '/new/cache.php') + 1
         );
 
         touch(
-            $this->dir . '/cache.php.meta',
-            filemtime($this->dir . '/cache.php.meta') + 1
+            $this->dir . '/new/cache.php.meta',
+            filemtime($this->dir . '/new/cache.php.meta') + 1
         );
 
         // bootstrap the application again

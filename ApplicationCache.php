@@ -112,6 +112,13 @@ class ApplicationCache extends Application
             throw CacheException::notBuilder(); // @codeCoverageIgnore
         }
 
+        $dir = dirname($file);
+
+        if (!file_exists($dir)
+            && !mkdir($dir, 0755, true)) {
+            throw CacheException::cannotCreateDir($dir); // @codeCoverageIgnore
+        }
+
         $this->dumpXmlConfig($container, $file);
 
         if (!$container->isFrozen()) {
