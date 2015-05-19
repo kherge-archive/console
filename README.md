@@ -142,7 +142,7 @@ Using the Container
 `Application` is designed around the use of the container. All functionality
 that is provided by **Console** can be found as a parameter or service within
 the container. As a result, all changes to the console (adding commands, adding
-helpers, changing defaults, etc) must also occur through the container.
+helpers, changing defaults, etc) must also occur through the container. 
 
 ### Loading Resources
 
@@ -382,6 +382,23 @@ services:
             - { name: box.console.event.subscriber }
 ```
 
+### Registering Extensions
+
+Extensions provide another way of setting parameters and setting service
+definitions for the container. However, in order make those extensions available
+to the `container` helper so that the bundled commands still work, registration
+must be done through the `registerExtension()` method.
+
+
+```php
+$app->registerExtension(new MyExtension());
+```
+
+This will create a tagged service definition in the container builder, in
+addition to register the extension with the container. This will allow the
+helper to re-register the same extension when a new container builder is created
+for the bundled commands.
+
 The Defaults
 ------------
 
@@ -596,8 +613,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 ApplicationCache::bootstrap(
     '/path/to/cache/example.php',
-    function (ContainerBuilder $container) {
+    function (ContainerBuilder $container, ApplicationCache $app) {
         // first-run container building
+        // register extensions using $app
     },
     'MyCachedContainer', // name of cached container class
     true                 // toggle debugging
