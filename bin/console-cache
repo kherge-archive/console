@@ -1,0 +1,53 @@
+#!/usr/bin/env php
+<?php
+
+use Box\Component\Console\Application;
+use Box\Component\Console\ApplicationCache;
+use Box\Component\Console\Loader\Resource;
+use Box\Component\Console\Loader\ResourceCollection;
+use Box\Component\Console\Loader\ResourceCollectionLoader;
+use Box\Component\Console\Loader\ResourceSupport;
+use Box\Component\Console\Tests\DependencyInjection\Extension;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+
+// load composer autoloader
+require __DIR__ . '/../Tests/autoload.php';
+
+$app = ApplicationCache::bootstrap(
+    __DIR__ . '/../.cache/TestContainer.php',
+    function (ContainerBuilder $container, ApplicationCache $app) {
+
+        // register the test extension
+        $app->registerExtension(new Extension());
+
+        // load test configuration if available
+        $locator = new FileLocator(array('.'));
+        $loader = new ResourceCollectionLoader(
+            new LoaderResolver(
+                array(
+                    new XmlFileLoader($container, $locator),
+                    new YamlFileLoader($container, $locator)
+                )
+            )
+        );
+
+        $loader->loadOptional(
+            new ResourceCollection(
+                array(
+                    new Resource('test.xml'),
+                    new ResourceSupport('test.xml.dist', 'test.xml'),
+                    new Resource('test.yml'),
+                    new ResourceSupport('test.yml.dist', 'test.yml')
+                )
+            )
+        );
+
+    },
+    'TestContainer'
+);
+
+$app->run();

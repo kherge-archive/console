@@ -3,3 +3,6 @@
 
 # composer files
 /composer.lock
+
+# console directories
+/.cache/
