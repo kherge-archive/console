@@ -54,6 +54,7 @@ class ApplicationCache extends Application
                 $setup($container, $app);
             }
 
+            /** @noinspection PhpUndefinedMethodInspection */
             $app
                 ->loadFromExtensions()
                 ->save($file, $class, $debug);
@@ -88,6 +89,7 @@ class ApplicationCache extends Application
             throw CacheException::cacheStale($file); // @codeCoverageIgnore
         }
 
+        /** @noinspection PhpIncludeInspection */
         require_once $file;
 
         if (!class_exists($class)) {
@@ -121,11 +123,11 @@ class ApplicationCache extends Application
             throw CacheException::cannotCreateDir($dir); // @codeCoverageIgnore
         }
 
-        $this->dumpXmlConfig($container, $file);
-
         if (!$container->isFrozen()) {
             $container->compile();
         }
+
+        $this->dumpXmlConfig($container, $file);
 
         $dumper = new PhpDumper($container);
         $cache = new ConfigCache($file, $debug);
