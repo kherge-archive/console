@@ -23,11 +23,11 @@ class YamlHelper extends Helper
         return preg_replace(
             array(
                 '/(#[^\n]+)/',
-                '/(\w+:)/'
+                '/^(\s*)(\w+:)/'
             ),
             array(
                 '<fg=green>\1</fg=green>',
-                '<fg=yellow>\1</fg=yellow>'
+                '\1<fg=yellow>\2</fg=yellow>'
             ),
             $yaml
         );
