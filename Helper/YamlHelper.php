@@ -22,12 +22,10 @@ class YamlHelper extends Helper
     {
         return preg_replace(
             array(
-                '/^(\s*)(#[^\n]+)/m',
-                '/(#[^\n]+)$/',
+                '/(#[^"\'\n]+)$/m',
                 '/^(\s*)(\w+:)/m'
             ),
             array(
-                '\1<fg=green>\2</fg=green>',
                 '<fg=green>\1</fg=green>',
                 '\1<fg=yellow>\2</fg=yellow>'
             ),

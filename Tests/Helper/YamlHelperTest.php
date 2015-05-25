@@ -31,6 +31,7 @@ class YamlHelperTest extends TestCase
 
     <fg=green># this is a key: in a comment</fg=green>
     <fg=yellow>sub_key:</fg=yellow> value <fg=green># trailing comment</fg=green>
+    <fg=yellow>another:</fg=yellow> "#value"
 EXPECTED
             ,
             $this->helper->colorize(
@@ -40,6 +41,7 @@ this_is_a_key:
 
     # this is a key: in a comment
     sub_key: value # trailing comment
+    another: "#value"
 YAML
             )
         );
