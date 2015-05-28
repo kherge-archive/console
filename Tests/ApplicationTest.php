@@ -11,8 +11,9 @@ use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -25,8 +26,28 @@ use Symfony\Component\Yaml\Yaml;
  * @covers \Box\Component\Console\DependencyInjection\Compiler\CommandPass
  * @covers \Box\Component\Console\DependencyInjection\Compiler\HelperPass
  */
-class ApplicationTest extends CommandTestCase
+class ApplicationTest extends CommandTestCase implements EventSubscriberInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            ConsoleEvents::COMMAND => 'onCommandEvent'
+        );
+    }
+
+    /**
+     * Adds a message to the console output.
+     *
+     * @param ConsoleCommandEvent $event The event arguments.
+     */
+    public static function onCommandEvent(ConsoleCommandEvent $event)
+    {
+        $event->getOutput()->writeln('Event listened.');
+    }
+
     /**
      * Verifies that we can set and retrieve the container.
      */
@@ -101,16 +122,10 @@ class ApplicationTest extends CommandTestCase
     public function testRun()
     {
         // registers a simple event listener
-        $this
-            ->container
-            ->get(Application::getId('event_dispatcher'))
-            ->addListener(
-                ConsoleEvents::COMMAND,
-                function (ConsoleCommandEvent $event) {
-                    $event->getOutput()->writeln('Event listened.');
-                }
-            )
-        ;
+        $definition = new Definition(__CLASS__);
+        $definition->addTag(Application::getId('event.subscriber'));
+
+        $this->container->setDefinition('test_event', $definition);
 
         // register our own IO
         $input = new ArrayInput(array());
@@ -120,9 +135,7 @@ class ApplicationTest extends CommandTestCase
         $this->container->set(Application::getId('output'), $output);
 
         // compile the container ourselves
-        if ($this->container instanceof ContainerBuilder) {
-            $this->container->compile();
-        }
+        $this->container->compile();
 
         // make sure the exit status is returned
         self::assertEquals(0, $this->application->run());

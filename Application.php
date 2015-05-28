@@ -200,7 +200,7 @@ class Application
          * box.console.event.subscriber
          */
         if (class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $passes[] = new RegisterListenersPass(
+            $passes[PassConfig::TYPE_BEFORE_OPTIMIZATION][] = new RegisterListenersPass(
                 self::getId('event_dispatcher'),
                 self::getId('event.listener'),
                 self::getId('event.subscriber')
