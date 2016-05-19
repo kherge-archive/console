@@ -1,5 +1,5 @@
 {
-    "name": "box-project/console",
+    "name": "letgoapp/console",
     "description": "A console application assembled through dependency injection.",
     "keywords": ["console", "dependency", "injection"],
     "license": "MIT",
